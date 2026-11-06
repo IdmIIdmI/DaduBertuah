@@ -3,597 +3,816 @@
 <html lang="ms">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no">
-<meta name="theme-color" content="#123d2b">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
+<meta name="theme-color" content="#123c2b">
 <title>Dadu Peti Misteri</title>
+
 <style>
 *{box-sizing:border-box}
-body{margin:0;color:#fff;font-family:Arial,sans-serif;background:radial-gradient(ellipse at top,#39845a,#123b2b 70%,#08251e);min-height:100vh}
-header{text-align:center;padding:13px 5px}
-header h1{margin:3px;color:#ffe49a;font-size:clamp(22px,5vw,36px);text-shadow:0 3px 5px #000}
-header p{margin:5px;font-size:12px;color:#d7efdc}
-.game{max-width:1050px;margin:auto;padding:8px}
-.hud{display:grid;grid-template-columns:repeat(4,1fr);gap:6px;margin-bottom:10px}
-.player{text-align:center;background:#153e30;border:2px solid #568a61;border-radius:12px;padding:7px 2px;font-size:11px}
-.player.active{border-color:#ffe37d;box-shadow:0 0 13px #ffe37d;background:#285b3d}
-.animal{font-size:28px;display:block}
-.player strong{display:block;color:#ffe49a;margin:3px 0}
-.player small{color:#c7e9d0}
-.board-wrap{padding:6px;border:5px solid #bc934e;border-radius:15px;background:linear-gradient(135deg,#176b40,#0d432e);box-shadow:0 8px 25px #0009,inset 0 0 20px #0005}
-.board{display:grid;grid-template-columns:repeat(10,minmax(0,1fr));gap:3px}
-.tile{aspect-ratio:1;min-width:0;position:relative;display:flex;align-items:center;justify-content:center;flex-direction:column;overflow:hidden;border:1px solid #c0df9b;border-radius:5px;background:linear-gradient(145deg,#b2df77,#5c9d43);color:#173b22;box-shadow:inset 0 -3px 0 #36733a}
-.tile:nth-child(4n){background:linear-gradient(145deg,#d7e995,#79b64b)}
-.tile.chest{background:linear-gradient(145deg,#ffe58b,#d99b2c);border:2px solid #fff2a6;box-shadow:0 0 9px #ffd75c}
-.tile.opened{filter:brightness(.75)}
-.tile.finish{background:linear-gradient(145deg,#fff0ae,#e3a92e)}
-.number{position:absolute;top:2px;left:3px;font-size:clamp(7px,1.4vw,11px);font-weight:bold}
-.chest-icon{font-size:clamp(13px,3vw,25px)}
-.tokens{display:flex;flex-wrap:wrap;justify-content:center;align-items:center;gap:0;z-index:2}
-.token{font-size:clamp(13px,3.2vw,26px);line-height:1.1;filter:drop-shadow(0 2px 2px #333);animation:hop .65s infinite ease-in-out}
-@keyframes hop{0%,100%{transform:translateY(0)}50%{transform:translateY(-4px)}}
-.controls{margin-top:12px;padding:13px;text-align:center;border:2px solid #578e61;border-radius:15px;background:#103b30}
-.turn{color:#ffe68b;font-size:18px;font-weight:bold}
-
-/* DADU 3D */
-.dice-stage{
- width:130px;height:120px;margin:14px auto 18px;
- perspective:650px;display:flex;align-items:center;justify-content:center;
+body{
+ margin:0;background:#102d22;color:white;
+ font-family:Arial,sans-serif;overflow-x:hidden;
 }
-.dice-cube{
- width:76px;height:76px;position:relative;
- transform-style:preserve-3d;
- transform:rotateX(-15deg) rotateY(-25deg);
+button{font-family:inherit;cursor:pointer}
+header{
+ text-align:center;padding:14px 8px;
+ background:linear-gradient(135deg,#164c35,#26734c);
+ border-bottom:3px solid #d9b65b;
 }
-.dice-face{
- position:absolute;width:76px;height:76px;
+header h1{margin:0;font-size:clamp(22px,5vw,34px);color:#ffe69a}
+header p{margin:5px 0 0;font-size:13px}
+.container{max-width:1100px;margin:auto;padding:10px}
+.topbar{
+ display:flex;justify-content:space-between;align-items:center;
+ gap:8px;flex-wrap:wrap;margin-bottom:10px;
+}
+.info{
+ background:#1b4935;border:1px solid #548465;
+ border-radius:12px;padding:9px 12px;font-size:13px;
+}
+.controls{display:flex;gap:7px;flex-wrap:wrap}
+.smallbtn{
+ border:1px solid #8db99a;background:#245b3d;color:white;
+ padding:9px 12px;border-radius:9px;font-weight:bold;
+}
+.players{
+ display:grid;grid-template-columns:repeat(4,1fr);
+ gap:7px;margin:10px 0;
+}
+.player{
+ background:#1b4935;border:2px solid #467858;
+ border-radius:12px;padding:8px 4px;text-align:center;
+ min-width:0;opacity:.7;
+}
+.player.active{border-color:#ffdc66;opacity:1;box-shadow:0 0 12px #e9c34c}
+.player .animal{font-size:30px}
+.player strong{display:block;font-size:12px}
+.player small{font-size:10px;color:#d4e8d8}
+.board-wrap{
+ background:#17412e;border:3px solid #b99b52;
+ border-radius:15px;padding:7px;overflow:hidden;
+}
+.board{
+ display:grid;grid-template-columns:repeat(20,minmax(0,1fr));
+ gap:3px;
+}
+.tile{
+ aspect-ratio:1/1;min-width:0;position:relative;
  display:flex;align-items:center;justify-content:center;
- border-radius:13px;border:3px solid #d4d4d4;
- background:linear-gradient(145deg,#fff,#d9d9d9);
- color:#172d25;font-size:49px;font-weight:bold;
- box-shadow:inset 0 0 12px #aaa,0 2px 5px #0005;
+ border-radius:4px;background:#d4e8ae;color:#25432d;
+ font-size:clamp(7px,1.6vw,12px);font-weight:bold;
+ border:1px solid #9eb77b;
+}
+.tile:nth-child(4n){background:#b9d994}
+.tile.chest{background:#e5bd5d;border:1px solid #fff0a4}
+.tile.start{background:#83c7a0}
+.tile.finish{background:#f1d36c}
+.tile .chesticon{font-size:clamp(10px,2vw,18px)}
+.tile .occupants{
+ position:absolute;bottom:0;right:0;left:0;
+ display:flex;justify-content:center;flex-wrap:wrap;
+ font-size:clamp(9px,2vw,17px);line-height:1;
+ text-shadow:0 1px 2px #000;
+}
+.tile .number{position:absolute;top:1px;left:2px;font-size:8px;opacity:.7}
+.game-area{
+ display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:12px;
+}
+.panel{
+ background:#1b4935;border:1px solid #548465;
+ border-radius:14px;padding:12px;text-align:center;
+}
+.panel h3{margin:0 0 8px;color:#ffe69a}
+.dice-stage{
+ height:125px;display:flex;align-items:center;justify-content:center;
+ perspective:700px;
+}
+.dice{
+ width:70px;height:70px;position:relative;
+ transform-style:preserve-3d;
+ transition:transform .45s cubic-bezier(.2,.8,.2,1);
+}
+.face{
+ position:absolute;width:70px;height:70px;
+ background:linear-gradient(145deg,#fff,#dce4dc);
+ border:3px solid #aebcae;border-radius:12px;
+ display:flex;align-items:center;justify-content:center;
+ color:#182b20;font-size:42px;font-weight:bold;
  backface-visibility:hidden;
+ box-shadow:inset 0 0 8px #9da99e;
 }
-.front{transform:translateZ(38px)}
-.back{transform:rotateY(180deg) translateZ(38px)}
-.right{transform:rotateY(90deg) translateZ(38px)}
-.left{transform:rotateY(-90deg) translateZ(38px)}
-.top{transform:rotateX(90deg) translateZ(38px)}
-.bottom{transform:rotateX(-90deg) translateZ(38px)}
-.dice-cube.rolling{
- animation:diceRoll  .42s linear infinite;
+.front{transform:translateZ(35px)}
+.back{transform:rotateY(180deg) translateZ(35px)}
+.right{transform:rotateY(90deg) translateZ(35px)}
+.left{transform:rotateY(-90deg) translateZ(35px)}
+.top{transform:rotateX(90deg) translateZ(35px)}
+.bottom{transform:rotateX(-90deg) translateZ(35px)}
+.dice.rolling{animation:rollDice .28s linear infinite}
+@keyframes rollDice{
+ 0%{transform:rotateX(0) rotateY(0) rotateZ(0)}
+ 25%{transform:rotateX(90deg) rotateY(110deg) rotateZ(30deg)}
+ 50%{transform:rotateX(190deg) rotateY(210deg) rotateZ(100deg)}
+ 75%{transform:rotateX(280deg) rotateY(310deg) rotateZ(210deg)}
+ 100%{transform:rotateX(360deg) rotateY(450deg) rotateZ(360deg)}
 }
-@keyframes diceRoll{
- 0%{transform:rotateX(0deg) rotateY(0deg) rotateZ(0deg) scale(1)}
- 25%{transform:rotateX(180deg) rotateY(150deg) rotateZ(90deg) scale(1.12)}
- 50%{transform:rotateX(360deg) rotateY(300deg) rotateZ(180deg) scale(.95)}
- 75%{transform:rotateX(540deg) rotateY(450deg) rotateZ(270deg) scale(1.12)}
- 100%{transform:rotateX(720deg) rotateY(600deg) rotateZ(360deg) scale(1)}
+.dice.result1{transform:rotateX(0) rotateY(0)}
+.dice.result2{transform:rotateX(0) rotateY(-90deg)}
+.dice.result3{transform:rotateX(-90deg) rotateY(0)}
+.dice.result4{transform:rotateX(90deg) rotateY(0)}
+.dice.result5{transform:rotateX(0) rotateY(90deg)}
+.dice.result6{transform:rotateX(0) rotateY(180deg)}
+.rollbtn{
+ background:linear-gradient(#ffe58b,#d5a82e);color:#49360b;
+ border:2px solid #fff0ac;border-radius:12px;
+ padding:12px 28px;font-size:18px;font-weight:900;
+ box-shadow:0 4px 0 #8c6a1b;
 }
-.dice-cube.result-1{transform:rotateX(0deg) rotateY(0deg)}
-.dice-cube.result-2{transform:rotateX(-90deg) rotateY(0deg)}
-.dice-cube.result-3{transform:rotateX(0deg) rotateY(-90deg)}
-.dice-cube.result-4{transform:rotateX(0deg) rotateY(90deg)}
-.dice-cube.result-5{transform:rotateX(90deg) rotateY(0deg)}
-.dice-cube.result-6{transform:rotateX(0deg) rotateY(180deg)}
-button{border:0;border-radius:12px;padding:13px 20px;font-size:16px;font-weight:bold;cursor:pointer}
-button:disabled{opacity:.4}
-.roll{background:linear-gradient(#ffeb9c,#e7a62b);color:#51320c;box-shadow:0 4px 0 #95621c}
-.roll:active{transform:translateY(3px);box-shadow:none}
-.reset,.audio-btn{background:#396b50;color:white;padding:10px;font-size:12px;margin:4px}
-.message{min-height:35px;padding:10px 4px 0;font-size:14px;color:#e2f5d8}
-.legend{display:flex;flex-wrap:wrap;justify-content:center;gap:10px;margin:10px 0;color:#e4f4db;font-size:12px}
-.modal{display:none;position:fixed;inset:0;z-index:20;background:#000c;align-items:center;justify-content:center;padding:14px}
-.modal.show{display:flex}
-.dialog{width:min(470px,100%);background:linear-gradient(145deg,#216748,#10372d);border:3px solid #e7bd59;border-radius:20px;padding:20px;text-align:center;box-shadow:0 0 35px #000;animation:pop .25s ease}
-@keyframes pop{from{transform:scale(.75);opacity:0}to{transform:scale(1);opacity:1}}
-.dialog h2{color:#ffe58c;margin:5px}
-.effect{font-size:65px;animation:hop .7s infinite}
-.subject{color:#a9e9b4;font-weight:bold}
-.question{font-size:20px;line-height:1.5;margin:18px 0}
-.answers{display:flex;gap:12px}
-.answers button{flex:1}
-.yes{background:#5bc779;color:#07351c}
-.no{background:#df6864;color:#fff}
-.instructions{text-align:left;line-height:1.6;font-size:14px;background:#0b3328;border-radius:12px;padding:13px;margin:12px 0}
-.start{background:linear-gradient(#ffeb9c,#e7a62b);color:#51320c;width:100%;margin-top:8px}
-.character-select{display:grid;grid-template-columns:repeat(2,1fr);gap:8px;margin:12px 0}
-.character{background:#184b36;border:1px solid #6b9c68;border-radius:10px;padding:8px}
-.character span{font-size:25px;display:block}
-.character strong{font-size:12px;color:#ffe58c}
-@media(max-width:430px){
- .game{padding:5px}.board-wrap{padding:4px}.board{gap:2px}
- .tile{border-radius:3px}.hud{gap:3px}
- .player{padding:6px 1px;font-size:9px}
- .question{font-size:18px}
+.rollbtn:disabled{opacity:.45;cursor:not-allowed}
+.status{font-size:13px;line-height:1.5;min-height:35px}
+.log{
+ margin-top:10px;background:#102f22;border-radius:10px;
+ padding:9px;text-align:left;font-size:12px;
+ max-height:90px;overflow:auto;color:#d7e9d9;
+}
+.modal{
+ position:fixed;inset:0;background:#000b;z-index:20;
+ display:flex;align-items:center;justify-content:center;padding:15px;
+}
+.modal.hidden{display:none}
+.dialog{
+ width:min(480px,100%);max-height:90vh;overflow:auto;
+ background:linear-gradient(145deg,#245b3e,#123b2b);
+ border:3px solid #e5c15c;border-radius:18px;
+ padding:20px;text-align:center;box-shadow:0 10px 40px #0009;
+}
+.dialog h2{color:#ffe69a;margin-top:0}
+.dialog p{line-height:1.55;font-size:14px}
+.primary{
+ background:linear-gradient(#ffe58b,#d5a82e);color:#49360b;
+ border:0;border-radius:10px;padding:12px 20px;
+ font-weight:900;font-size:16px;margin:5px;
+}
+.answer{
+ display:block;width:100%;margin:9px 0;padding:13px;
+ background:#e4edcf;color:#183c29;border:2px solid #a8c18b;
+ border-radius:10px;font-size:15px;font-weight:bold;
+}
+.answer:active{transform:scale(.98)}
+.effect{
+ font-size:65px;animation:pop .55s ease;
+}
+@keyframes pop{0%{transform:scale(.2);opacity:0}70%{transform:scale(1.2)}100%{transform:scale(1);opacity:1}}
+#questionText{font-size:18px;font-weight:bold;line-height:1.5}
+@media(max-width:600px){
+ .game-area{grid-template-columns:1fr}
+ .board{gap:2px}
+ .tile .number{font-size:6px}
+ .players{gap:4px}
+ .player{padding:6px 2px}
+ .player .animal{font-size:25px}
+ .player strong{font-size:10px}
+ .player small{font-size:9px}
+ .board-wrap{padding:4px}
 }
 </style>
 </head>
-<body>
 
+<body>
 <header>
-<h1>🎲 DADU PETI MISTERI</h1>
-<p>Pengembaraan ilmu empat sahabat menuju kejayaan!</p>
+ <h1>🎲 DADU PETI MISTERI 📦</h1>
+ <p>Jelajah • Berfikir • Belajar • Menang</p>
 </header>
 
-<main class="game">
-<section class="hud" id="players"></section>
-<div class="board-wrap"><div class="board" id="board"></div></div>
-<div class="legend">
-<span>🎁 Peti Misteri</span><span>👼 Bantuan Malaikat</span>
-<span>👹 Kejutan Jin</span><span>🏆 Penamat</span>
-</div>
-<section class="controls">
-<div class="turn" id="turn">Menunggu peserta</div>
+<div class="container">
+ <div class="topbar">
+  <div class="info" id="turnInfo">Pemain: Kijang</div>
+  <div class="controls">
+   <button class="smallbtn" id="musicBtn" onclick="toggleMusic()">🎵 Muzik: ON</button>
+   <button class="smallbtn" id="soundBtn" onclick="toggleSound()">🔊 Bunyi: ON</button>
+   <button class="smallbtn" onclick="restartGame()">↻ Mula semula</button>
+  </div>
+ </div>
 
-<div class="dice-stage">
- <div class="dice-cube" id="diceCube">
-  <div class="dice-face front">⚀</div>
-  <div class="dice-face back">⚅</div>
-  <div class="dice-face right">⚁</div>
-  <div class="dice-face left">⚄</div>
-  <div class="dice-face top">⚂</div>
-  <div class="dice-face bottom">⚃</div>
+ <div class="players" id="players"></div>
+
+ <div class="board-wrap">
+  <div class="board" id="board"></div>
+ </div>
+
+ <div class="game-area">
+  <div class="panel">
+   <h3>🎲 Dadu Misteri</h3>
+   <div class="dice-stage">
+    <div class="dice" id="dice">
+     <div class="face front">⚀</div>
+     <div class="face back">⚅</div>
+     <div class="face right">⚁</div>
+     <div class="face left">⚄</div>
+     <div class="face top">⚂</div>
+     <div class="face bottom">⚃</div>
+    </div>
+   </div>
+   <button class="rollbtn" id="rollBtn" onclick="rollDice()">BUANG DADU</button>
+   <div class="status" id="status">Tekan butang untuk mula bermain.</div>
+  </div>
+
+  <div class="panel">
+   <h3>📜 Catatan Pengembaraan</h3>
+   <div class="status" id="lastEvent">Belum ada pergerakan.</div>
+   <div class="log" id="log">Permainan menanti pengembara...</div>
+  </div>
  </div>
 </div>
 
-<button class="roll" id="roll" disabled>LEMPAR DADU</button>
-<button class="reset" id="reset">MULA SEMULA</button>
-<div class="message" id="message">Baca arahan sebelum bermain.</div>
-<div>
-<button class="audio-btn" id="musicToggle">🎵 Muzik ON</button>
-<button class="audio-btn" id="soundToggle">🔊 Bunyi ON</button>
-</div>
-</section>
-</main>
-
-<div class="modal show" id="introModal">
-<div class="dialog">
-<div class="effect">🎲</div>
-<h2>SELAMAT DATANG!</h2>
-<p>Pengembaraan Dadu Peti Misteri</p>
-<div class="instructions">
-<b>ARAHAN PESERTA</b><br>
-1. Empat peserta bermain mengikut giliran.<br>
-2. Setiap peserta menggunakan satu watak.<br>
-3. Tekan LEMPAR DADU untuk bergerak.<br>
-4. Jika berhenti tepat pada peti, jawab soalan BETUL atau SALAH.<br>
-5. Jawapan betul: malaikat membantu maju 3–8 petak.<br>
-6. Jawapan salah: jin menangkap watak dan mengundur 4–10 petak.<br>
-7. Peserta pertama sampai ke petak 200 menang!
-</div>
-<div class="character-select" id="characterSelect"></div>
-<button class="start" id="startGame">MULA PENGEMBARAAN</button>
-</div>
+<div class="modal" id="introModal">
+ <div class="dialog">
+  <div class="effect">🎲📦</div>
+  <h2>Selamat Datang!</h2>
+  <p>Empat pengembara akan berlumba menuju petak ke-200.</p>
+  <p>🎲 Setiap pemain membaling dadu mengikut giliran.</p>
+  <p>📦 Jika berhenti tepat pada peti misteri, satu soalan akan muncul.</p>
+  <p>✅ Jawapan betul: maju 3 hingga 8 petak.</p>
+  <p>❌ Jawapan salah: undur 4 hingga 10 petak.</p>
+  <p>🏆 Pemain pertama yang sampai ke petak 200 menjadi juara!</p>
+  <p><b>Subjek:</b> Agama, Matematik dan Sains.</p>
+  <button class="primary" onclick="startGame()">MULA PENGEMBARAAN</button>
+ </div>
 </div>
 
-<div class="modal" id="quizModal">
-<div class="dialog">
-<div class="effect">🎁</div>
-<h2>PETI MISTERI!</h2>
-<div class="subject" id="subject"></div>
-<div class="question" id="question"></div>
-<div class="answers">
-<button class="yes" id="yes">BETUL</button>
-<button class="no" id="no">SALAH</button>
-</div>
-</div>
+<div class="modal hidden" id="questionModal">
+ <div class="dialog">
+  <div class="effect">📦</div>
+  <h2>Peti Misteri Dibuka!</h2>
+  <p id="subjectName"></p>
+  <div id="questionText"></div>
+  <div id="answerArea"></div>
+ </div>
 </div>
 
-<div class="modal" id="effectModal">
-<div class="dialog">
-<div class="effect" id="effectIcon"></div>
-<h2 id="effectTitle"></h2>
-<div class="question" id="effectText"></div>
+<div class="modal hidden" id="effectModal">
+ <div class="dialog">
+  <div class="effect" id="effectEmoji">✨</div>
+  <h2 id="effectTitle"></h2>
+  <p id="effectText"></p>
+  <button class="primary" onclick="closeEffect()">TERUSKAN</button>
+ </div>
 </div>
+
+<div class="modal hidden" id="winModal">
+ <div class="dialog">
+  <div class="effect">🏆🎉</div>
+  <h2>JUARA PENGEMBARAAN!</h2>
+  <p id="winnerText"></p>
+  <button class="primary" onclick="restartGame()">MAIN SEMULA</button>
+ </div>
 </div>
 
 <script>
-"use strict";
-const $=id=>document.getElementById(id);
+/* =====================================
+   DATA PEMAIN DAN PAPAN PERMAINAN
+===================================== */
 
-const animals=[
-{name:"Raden Arunika",species:"Kijang",icon:"🦌"},
-{name:"Puteri Lazuardi",species:"Arnab",icon:"🐰"},
-{name:"Bara Wira",species:"Panda Merah",icon:"🦊"},
-{name:"Tara Cendana",species:"Tupai",icon:"🐿️"}
+const players=[
+ {name:"Raden Arunika",animal:"🦌",short:"Kijang",pos:0},
+ {name:"Puteri Lazuardi",animal:"🐰",short:"Arnab",pos:0},
+ {name:"Bara Wira",animal:"🐼",short:"Panda Merah",pos:0},
+ {name:"Tara Cendana",animal:"🐿️",short:"Tupai",pos:0}
 ];
 
+const TOTAL=200;
+const CHEST_COUNT=30;
+let current=0;
+let chests=new Set();
+let gameStarted=false;
+let busy=false;
+let gameOver=false;
+let audioCtx=null;
+let masterGain=null;
+let musicGain=null;
+let musicOn=true;
+let soundOn=true;
+let musicTimer=null;
+let musicStep=0;
+let diceTimer=null;
+let currentQuestion=null;
+
 const questions={
-Agama:[
-["Solat fardu sehari semalam ada lima waktu.",true],
-["Kita digalakkan bercakap benar.",true],
-["Kita boleh mengejek kawan.",false],
-["Al-Quran ialah kitab suci umat Islam.",true],
-["Menjaga kebersihan ialah amalan baik.",true],
-["Berbohong ialah perbuatan terpuji.",false],
-["Kita perlu menghormati ibu bapa.",true],
-["Memberi salam ialah amalan baik.",true],
-["Kita boleh mengambil barang orang tanpa izin.",false],
-["Bersedekah merupakan amalan baik.",true],
-["Berbuat baik kepada jiran ialah amalan mulia.",true],
-["Kita boleh sengaja menyakiti haiwan.",false]
-],
-Matematik:[
-["7 + 5 = 12.",true],["9 - 4 = 6.",false],
-["3 × 4 = 12.",true],["20 ÷ 5 = 4.",true],
-["15 lebih kecil daripada 8.",false],["10 + 10 = 20.",true],
-["6 × 2 = 10.",false],["30 ÷ 3 = 10.",true],
-["8 + 9 = 17.",true],["25 - 5 = 15.",false],
-["5 × 5 = 25.",true],["40 ÷ 8 = 6.",false]
-],
-Sains:[
-["Matahari ialah sumber cahaya semula jadi.",true],
-["Ikan bernafas menggunakan insang.",true],
-["Akar membantu tumbuhan menyerap air.",true],
-["Bulan menghasilkan cahaya sendiri.",false],
-["Air boleh membeku apabila cukup sejuk.",true],
-["Manusia bernafas menggunakan paru-paru.",true],
-["Semua haiwan hidup di dalam air.",false],
-["Daun biasanya berwarna hijau.",true],
-["Ais ialah air dalam keadaan pepejal.",true],
-["Matahari ialah sebuah planet.",false],
-["Tumbuhan memerlukan air untuk hidup.",true],
-["Bumi mengelilingi Matahari.",true]
-]
+ Agama:[
+  ["Kita perlu mengucapkan salam apabila bertemu sesama Muslim.",true],
+  ["Solat Subuh mempunyai empat rakaat.",false],
+  ["Bersedekah ialah amalan yang baik.",true],
+  ["Kita boleh bercakap bohong sesuka hati.",false],
+  ["Ibu bapa perlu dihormati.",true],
+  ["Al-Quran ialah kitab suci umat Islam.",true],
+  ["Berwuduk dilakukan sebelum solat.",true],
+  ["Puasa Ramadan diwajibkan pada bulan Ramadan.",true],
+  ["Kita perlu menjaga kebersihan.",true],
+  ["Mengejek kawan ialah akhlak yang baik.",false],
+  ["Nabi Muhammad SAW ialah rasul terakhir.",true],
+  ["Membantu orang yang memerlukan ialah perbuatan baik.",true],
+  ["Kita boleh meninggalkan amanah tanpa sebab.",false],
+  ["Solat Maghrib mempunyai tiga rakaat.",true],
+  ["Berterima kasih tanda menghargai kebaikan.",true],
+  ["Kita digalakkan berdoa kepada Allah.",true],
+  ["Mencuri barang orang lain dibenarkan.",false],
+  ["Membaca Bismillah sebelum makan ialah amalan baik.",true],
+  ["Kita perlu bercakap dengan sopan.",true],
+  ["Menjaga hubungan sesama manusia itu penting.",true]
+ ],
+ Matematik:[
+  ["5 + 3 = 8",true],
+  ["10 - 4 = 3",false],
+  ["6 × 2 = 12",true],
+  ["20 ÷ 5 = 4",true],
+  ["7 + 6 = 14",false],
+  ["15 - 7 = 8",true],
+  ["4 × 4 = 16",true],
+  ["30 ÷ 3 = 10",true],
+  ["9 + 9 = 19",false],
+  ["12 - 5 = 7",true],
+  ["3 × 5 = 15",true],
+  ["18 ÷ 2 = 9",true],
+  ["25 + 5 = 30",true],
+  ["40 - 15 = 20",false],
+  ["8 × 3 = 24",true],
+  ["36 ÷ 6 = 6",true],
+  ["100 lebih besar daripada 90.",true],
+  ["Nombor 45 ialah nombor genap.",false],
+  ["Satu jam mempunyai 60 minit.",true],
+  ["Satu dozen bersamaan 12 biji.",true]
+ ],
+ Sains:[
+  ["Matahari membekalkan cahaya dan haba.",true],
+  ["Ikan bernafas menggunakan paru-paru seperti manusia.",false],
+  ["Tumbuhan memerlukan air untuk hidup.",true],
+  ["Ais ialah air dalam bentuk pepejal.",true],
+  ["Bulan menghasilkan cahaya sendiri seperti Matahari.",false],
+  ["Manusia bernafas menggunakan paru-paru.",true],
+  ["Akar membantu tumbuhan menyerap air.",true],
+  ["Air laut biasanya masin.",true],
+  ["Burung mempunyai sayap.",true],
+  ["Semua haiwan hidup di dalam air.",false],
+  ["Bumi mengelilingi Matahari.",true],
+  ["Gigi membantu kita mengunyah makanan.",true],
+  ["Kucing ialah haiwan herbivor.",false],
+  ["Hujan turun daripada awan.",true],
+  ["Telinga membantu kita mendengar.",true],
+  ["Kupu-kupu bermula sebagai ulat beluncas.",true],
+  ["Magnet boleh menarik semua jenis kayu.",false],
+  ["Udara memenuhi ruang.",true],
+  ["Air boleh berubah menjadi wap apabila dipanaskan.",true],
+  ["Jantung membantu mengepam darah.",true]
+ ]
 };
 
-/* SISTEM AUDIO */
-let audioCtx=null,master=null,musicGain=null;
-let musicTimer=null,musicOn=true,soundOn=true,musicStep=0;
-let diceSoundTimer=null;
+/* =====================================
+   SISTEM AUDIO - DIJANA DALAM PELAYAR
+===================================== */
 
 function initAudio(){
- if(audioCtx)return;
+ if(audioCtx){
+  if(audioCtx.state==="suspended") audioCtx.resume();
+  return;
+ }
  const AC=window.AudioContext||window.webkitAudioContext;
  if(!AC)return;
  audioCtx=new AC();
- master=audioCtx.createGain();
- master.gain.value=.85;
- master.connect(audioCtx.destination);
+ masterGain=audioCtx.createGain();
+ masterGain.gain.value=.9;
+ masterGain.connect(audioCtx.destination);
+
  musicGain=audioCtx.createGain();
- musicGain.gain.value=.24;
- musicGain.connect(master);
+ musicGain.gain.value=.22;
+ musicGain.connect(masterGain);
 }
 
-async function unlockAudio(){
- initAudio();
- if(audioCtx&&audioCtx.state==="suspended"){
-  try{await audioCtx.resume()}catch(e){}
- }
-}
-
-function tone(freq,duration=.15,type="sine",volume=.12,delay=0){
- if(!soundOn)return;
- initAudio();if(!audioCtx)return;
- const now=audioCtx.currentTime+delay;
+function tone(freq,duration=.15,type="sine",volume=.3,delay=0){
+ if(!soundOn||!audioCtx)return;
+ const t=audioCtx.currentTime+delay;
  const osc=audioCtx.createOscillator();
  const gain=audioCtx.createGain();
  osc.type=type;
- osc.frequency.setValueAtTime(freq,now);
- gain.gain.setValueAtTime(.001,now);
- gain.gain.exponentialRampToValueAtTime(volume,now+.02);
- gain.gain.exponentialRampToValueAtTime(.001,now+duration);
- osc.connect(gain);gain.connect(master);
- osc.start(now);osc.stop(now+duration+.04);
+ osc.frequency.setValueAtTime(freq,t);
+ gain.gain.setValueAtTime(.001,t);
+ gain.gain.exponentialRampToValueAtTime(Math.max(.001,volume),t+.015);
+ gain.gain.exponentialRampToValueAtTime(.001,t+duration);
+ osc.connect(gain);gain.connect(masterGain);
+ osc.start(t);osc.stop(t+duration+.03);
 }
 
-function noise(duration=.15,volume=.1){
- if(!soundOn)return;
- initAudio();if(!audioCtx)return;
- const len=Math.max(1,Math.floor(audioCtx.sampleRate*duration));
- const buffer=audioCtx.createBuffer(1,len,audioCtx.sampleRate);
+function noise(duration=.12,volume=.2,frequency=1200){
+ if(!soundOn||!audioCtx)return;
+ const length=Math.max(1,Math.floor(audioCtx.sampleRate*duration));
+ const buffer=audioCtx.createBuffer(1,length,audioCtx.sampleRate);
  const data=buffer.getChannelData(0);
- for(let i=0;i<len;i++)data[i]=(Math.random()*2-1)*(1-i/len);
- const source=audioCtx.createBufferSource();
+ for(let i=0;i<length;i++){
+  data[i]=(Math.random()*2-1)*(1-i/length);
+ }
+ const src=audioCtx.createBufferSource();
+ const filter=audioCtx.createBiquadFilter();
  const gain=audioCtx.createGain();
- source.buffer=buffer;gain.gain.value=volume;
- source.connect(gain);gain.connect(master);source.start();
+ src.buffer=buffer;
+ filter.type="lowpass";
+ filter.frequency.value=frequency;
+ gain.gain.value=volume;
+ src.connect(filter);filter.connect(gain);gain.connect(masterGain);
+ src.start();
 }
 
+function playClick(){tone(650,.07,"sine",.13)}
 function playStep(){
- tone(150,.09,"triangle",.12);
- tone(230,.07,"sine",.09,.04);
+ tone(125,.08,"triangle",.18);
+ noise(.045,.09,500);
+}
+function playChest(){
+ tone(330,.12,"triangle",.22,0);
+ tone(440,.14,"triangle",.25,.12);
+ tone(660,.24,"sine",.3,.26);
+}
+function playCorrect(){
+ tone(523,.16,"sine",.25,0);
+ tone(659,.16,"sine",.25,.14);
+ tone(784,.25,"sine",.3,.28);
+ tone(1046,.35,"sine",.25,.45);
+}
+function playWrong(){
+ tone(260,.2,"sawtooth",.18,0);
+ tone(190,.28,"sawtooth",.2,.2);
+ noise(.2,.12,700);
+}
+function playAngel(){
+ tone(880,.22,"sine",.18,0);
+ tone(1174,.25,"sine",.2,.18);
+ tone(1568,.5,"sine",.2,.38);
+}
+function playGenie(){
+ tone(180,.2,"triangle",.2,0);
+ tone(260,.2,"triangle",.2,.12);
+ tone(130,.45,"sawtooth",.15,.25);
+}
+function playVictory(){
+ [523,659,784,1046,784,1046,1318].forEach((n,i)=>{
+  tone(n,.28,"sine",.24,i*.18);
+ });
 }
 function playDice(){
- noise(.22,.22);
- tone(350,.12,"square",.12);
- tone(520,.09,"triangle",.1,.08);
+ noise(.15,.22,1800);
+ tone(230,.12,"square",.12);
 }
 function startDiceRattle(){
  stopDiceRattle();
- if(!soundOn)return;
- diceSoundTimer=setInterval(()=>{
-  noise(.11,.16);
-  tone(180+Math.random()*300,.07,"square",.07);
- },145);
+ if(!soundOn||!audioCtx)return;
+ diceTimer=setInterval(()=>{
+  noise(.075,.15,2200);
+  tone(150+Math.random()*180,.06,"square",.08);
+ },125);
 }
 function stopDiceRattle(){
- if(diceSoundTimer){clearInterval(diceSoundTimer);diceSoundTimer=null}
+ if(diceTimer){clearInterval(diceTimer);diceTimer=null}
 }
-function playChest(){
- [523,659,784,1047].forEach((f,i)=>tone(f,.3,"sine",.16,i*.1));
+function toggleSound(){
+ soundOn=!soundOn;
+ document.getElementById("soundBtn").textContent=
+  soundOn?"🔊 Bunyi: ON":"🔇 Bunyi: OFF";
+ if(soundOn){initAudio();playClick()}
+ else stopDiceRattle();
 }
-function playCorrect(){
- [523,659,784,1047,1318].forEach((f,i)=>tone(f,.3,"sine",.16,i*.12));
-}
-function playWrong(){
- tone(180,.5,"sawtooth",.2);
- tone(110,.6,"sawtooth",.17,.2);
- noise(.4,.16);
-}
-function playAngel(){
- [784,988,1175,1568].forEach((f,i)=>tone(f,.5,"sine",.16,i*.16));
-}
-function playGenie(){
- tone(100,.7,"sawtooth",.2);
- tone(75,.8,"triangle",.2,.18);
- tone(160,.3,"sawtooth",.15,.45);
-}
-function playVictory(){
- [523,659,784,1047,784,1047,1318].forEach((f,i)=>tone(f,.5,"triangle",.19,i*.18));
-}
-function playClick(){tone(600,.09,"sine",.12)}
-
-const melody=[523,659,784,659,587,698,880,698,523,659,784,1047,880,784,659,523];
-const bass=[131,131,165,165,147,147,196,196,131,131,165,165,196,165,147,131];
-
-function musicBeat(){
- if(!musicOn||!audioCtx||audioCtx.state==="suspended")return;
- const i=musicStep%melody.length,now=audioCtx.currentTime;
- function note(freq,duration,vol,type){
-  const osc=audioCtx.createOscillator(),g=audioCtx.createGain();
-  osc.type=type;osc.frequency.value=freq;
-  g.gain.setValueAtTime(.001,now);
-  g.gain.exponentialRampToValueAtTime(vol,now+.025);
-  g.gain.exponentialRampToValueAtTime(.001,now+duration);
-  osc.connect(g);g.connect(musicGain);
-  osc.start(now);osc.stop(now+duration+.02);
- }
- note(melody[i],.25,.13,"triangle");
- if(i%2===0)note(bass[i],.38,.10,"sine");
- musicStep++;
+function toggleMusic(){
+ musicOn=!musicOn;
+ document.getElementById("musicBtn").textContent=
+  musicOn?"🎵 Muzik: ON":"🎵 Muzik: OFF";
+ if(musicOn){initAudio();startMusic()}
+ else stopMusic();
 }
 function startMusic(){
- initAudio();if(!audioCtx)return;
- if(audioCtx.state==="suspended")audioCtx.resume();
- if(musicTimer)clearInterval(musicTimer);
- if(musicOn)musicTimer=setInterval(musicBeat,260);
+ if(!musicOn||!audioCtx||musicTimer)return;
+ const melody=[392,494,587,494,440,523,659,523,392,494,587,784,659,587,494,440];
+ musicTimer=setInterval(()=>{
+  if(!musicOn||!audioCtx||!musicGain)return;
+  const t=audioCtx.currentTime;
+  const osc=audioCtx.createOscillator();
+  const gain=audioCtx.createGain();
+  osc.type="sine";
+  osc.frequency.value=melody[musicStep%melody.length];
+  gain.gain.setValueAtTime(.001,t);
+  gain.gain.linearRampToValueAtTime(.12,t+.04);
+  gain.gain.exponentialRampToValueAtTime(.001,t+.38);
+  osc.connect(gain);gain.connect(musicGain);
+  osc.start(t);osc.stop(t+.4);
+  if(musicStep%4===0){
+   const bass=audioCtx.createOscillator();
+   const bg=audioCtx.createGain();
+   bass.type="triangle";
+   bass.frequency.value=[98,110,130,110][Math.floor(musicStep/4)%4];
+   bg.gain.setValueAtTime(.001,t);
+   bg.gain.linearRampToValueAtTime(.09,t+.03);
+   bg.gain.exponentialRampToValueAtTime(.001,t+.35);
+   bass.connect(bg);bg.connect(musicGain);
+   bass.start(t);bass.stop(t+.4);
+  }
+  musicStep++;
+ },420);
 }
 function stopMusic(){
- if(musicTimer)clearInterval(musicTimer);
- musicTimer=null;
+ if(musicTimer){clearInterval(musicTimer);musicTimer=null}
 }
 
-/* PERMAINAN */
-let players=[],current=0,chestTiles=[],chestContents={};
-let openedChests=new Set(),activeQuestion=null;
-let busy=false,gameOver=false;
+/* =====================================
+   PAPAN DAN PETI
+===================================== */
 
-function shuffle(a){
- let b=[...a];
- for(let i=b.length-1;i>0;i--){
-  let j=Math.floor(Math.random()*(i+1));
-  [b[i],b[j]]=[b[j],b[i]];
+function makeChests(){
+ chests.clear();
+ while(chests.size<CHEST_COUNT){
+  const n=5+Math.floor(Math.random()*190);
+  chests.add(n);
  }
- return b;
 }
-
-function prepareCharacters(){
- $("characterSelect").innerHTML="";
- animals.forEach(a=>{
-  const div=document.createElement("div");
-  div.className="character";
-  div.innerHTML=`<span>${a.icon}</span><strong>${a.name}</strong><br><small>${a.species}</small>`;
-  $("characterSelect").appendChild(div);
- });
-}
-
-function createChests(){
- chestTiles=shuffle(Array.from({length:190},(_,i)=>i+5))
- .slice(0,30).sort((a,b)=>a-b);
- chestContents={};
- chestTiles.forEach(tile=>{
-  const pack=[];
-  const subjects=shuffle(["Agama","Matematik","Sains"]);
-  subjects.forEach(subject=>{
-   const pool=questions[subject];
-   const q=pool[Math.floor(Math.random()*pool.length)];
-   pack.push({subject,text:q[0],correct:q[1]});
-  });
-  chestContents[tile]=pack;
- });
-}
-
-function buildBoard(){
- const board=$("board");board.innerHTML="";
- const chests=new Set(chestTiles);
- for(let i=0;i<200;i++){
-  const row=Math.floor(i/10),offset=i%10;
-  const col=row%2===0?offset:9-offset;
+function createBoard(){
+ const board=document.getElementById("board");
+ board.innerHTML="";
+ for(let i=0;i<TOTAL;i++){
   const tile=document.createElement("div");
   tile.className="tile";
-  tile.style.gridRow=row+1;
-  tile.style.gridColumn=col+1;
   tile.id="tile"+i;
+  if(i===0)tile.classList.add("start");
+  if(i===TOTAL-1)tile.classList.add("finish");
+  if(chests.has(i))tile.classList.add("chest");
+  const number=document.createElement("span");
+  number.className="number";
+  number.textContent=i+1;
+  tile.appendChild(number);
   if(chests.has(i)){
-   tile.classList.add("chest");
-   tile.innerHTML=`<span class="number">${i+1}</span><span class="chest-icon">🎁</span><div class="tokens"></div>`;
-  }else if(i===199){
-   tile.classList.add("finish");
-   tile.innerHTML='<span class="number">200</span><span>🏆</span><div class="tokens"></div>';
-  }else{
-   tile.innerHTML=`<span class="number">${i+1}</span><div class="tokens"></div>`;
+   const chest=document.createElement("span");
+   chest.className="chesticon";
+   chest.textContent="📦";
+   tile.appendChild(chest);
   }
+  const occupants=document.createElement("div");
+  occupants.className="occupants";
+  occupants.id="occupants"+i;
+  tile.appendChild(occupants);
   board.appendChild(tile);
  }
+ renderPlayers();
 }
-
-function render(){
- $("players").innerHTML="";
- players.forEach((p,i)=>{
-  const card=document.createElement("div");
-  card.className="player"+(i===current?" active":"");
-  card.innerHTML=`<span class="animal">${p.icon}</span>
-  <strong>${p.name}</strong><small>${p.species} · Petak ${p.position+1}</small>`;
-  $("players").appendChild(card);
- });
- document.querySelectorAll(".tokens").forEach(t=>t.innerHTML="");
- players.forEach(p=>{
-  const tile=$("tile"+p.position);
-  if(tile){
-   const token=document.createElement("span");
-   token.className="token";token.textContent=p.icon;
-   tile.querySelector(".tokens").appendChild(token);
+function renderPlayers(){
+ for(let i=0;i<TOTAL;i++){
+  const el=document.getElementById("occupants"+i);
+  if(el)el.innerHTML="";
+ }
+ players.forEach((p,index)=>{
+  const el=document.getElementById("occupants"+p.pos);
+  if(el){
+   const mark=document.createElement("span");
+   mark.textContent=p.animal;
+   mark.title=p.name;
+   el.appendChild(mark);
   }
  });
- $("turn").textContent=gameOver?"Permainan tamat!":"Giliran: "+players[current].name;
+ renderPlayerCards();
+}
+function renderPlayerCards(){
+ const box=document.getElementById("players");
+ box.innerHTML="";
+ players.forEach((p,i)=>{
+  const card=document.createElement("div");
+  card.className="player"+(i===current&&!gameOver?" active":"");
+  card.innerHTML=`<div class="animal">${p.animal}</div>
+   <strong>${p.short}</strong>
+   <small>Petak ${p.pos+1}</small>`;
+  box.appendChild(card);
+ });
+ document.getElementById("turnInfo").textContent=
+  "Giliran: "+players[current].short;
 }
 
-function say(t){$("message").textContent=t}
-function sleep(ms){return new Promise(r=>setTimeout(r,ms))}
+/* =====================================
+   ALIRAN PERMAINAN
+===================================== */
 
-async function movePlayer(index,amount){
- const p=players[index],dir=amount>=0?1:-1;
- for(let i=0;i<Math.abs(amount);i++){
-  p.position=Math.max(0,Math.min(199,p.position+dir));
-  playStep();render();await sleep(150);
- }
+function startGame(){
+ initAudio();
+ if(musicOn)startMusic();
+ document.getElementById("introModal").classList.add("hidden");
+ gameStarted=true;
+ busy=false;
+ gameOver=false;
+ current=0;
+ updateStatus("Giliran pertama. Buang dadu!");
+ log("Pengembaraan bermula!");
+ renderPlayers();
+ document.getElementById("rollBtn").disabled=false;
 }
-
-async function rollDice(){
- if(busy||gameOver)return;
- await unlockAudio();
- startMusic();
- busy=true;$("roll").disabled=true;
-
- const finalRoll=Math.floor(Math.random()*6)+1;
- const cube=$("diceCube");
-
- cube.className="dice-cube rolling";
+function restartGame(){
+ initAudio();
+ stopDiceRattle();
+ players.forEach(p=>p.pos=0);
+ current=0;
+ busy=false;
+ gameOver=false;
+ gameStarted=false;
+ makeChests();
+ createBoard();
+ document.getElementById("dice").className="dice";
+ document.getElementById("rollBtn").disabled=true;
+ document.getElementById("lastEvent").textContent="Permainan baharu menanti.";
+ document.getElementById("log").textContent="Papan baharu telah disediakan.";
+ document.getElementById("introModal").classList.remove("hidden");
+ document.getElementById("questionModal").classList.add("hidden");
+ document.getElementById("effectModal").classList.add("hidden");
+ document.getElementById("winModal").classList.add("hidden");
+ updateStatus("Bersedia untuk bermain.");
+}
+function updateStatus(text){
+ document.getElementById("status").textContent=text;
+}
+function log(text){
+ const box=document.getElementById("log");
+ box.innerHTML=text+"<br>"+box.innerHTML;
+}
+function randomInt(min,max){
+ return Math.floor(Math.random()*(max-min+1))+min;
+}
+function rollDice(){
+ if(!gameStarted||busy||gameOver)return;
+ initAudio();
+ if(audioCtx&&audioCtx.state==="suspended")audioCtx.resume();
+ busy=true;
+ document.getElementById("rollBtn").disabled=true;
+ const dice=document.getElementById("dice");
+ dice.className="dice rolling";
+ updateStatus("Dadu sedang bergolek...");
  playDice();
  startDiceRattle();
 
- // DADU BERGULING SELAMA 2.6 SAAT
- await sleep(2600);
-
- stopDiceRattle();
- cube.className="dice-cube result-"+finalRoll;
- tone(700,.22,"sine",.18);
-
- say(players[current].name+" mendapat "+finalRoll+" mata!");
- await sleep(450);
- await movePlayer(current,finalRoll);
-
- if(players[current].position===199){winGame();return}
- const tile=players[current].position;
- if(chestTiles.includes(tile)&&!openedChests.has(tile)){
-  await sleep(250);showQuestion(tile);
- }else finishTurn();
+ const result=randomInt(1,6);
+ setTimeout(()=>{
+  stopDiceRattle();
+  dice.className="dice result"+result;
+  tone(420,.09,"triangle",.2);
+  const p=players[current];
+  const old=p.pos;
+  p.pos=Math.min(TOTAL-1,p.pos+result);
+  log(`${p.short} membaling ${result}. Bergerak ke petak ${p.pos+1}.`);
+  updateStatus(`${p.short} mendapat ${result}.`);
+  moveAnimation(p,old,p.pos,()=>{
+   renderPlayers();
+   if(p.pos>=TOTAL-1){
+    finishGame(p);
+    return;
+   }
+   if(chests.has(p.pos)){
+    openChest();
+   }else{
+    nextTurn();
+   }
+  });
+ },2600);
+}
+function moveAnimation(player,from,to,done){
+ const direction=to>=from?1:-1;
+ let pos=from;
+ const interval=setInterval(()=>{
+  if(pos===to){
+   clearInterval(interval);
+   done();
+   return;
+  }
+  pos+=direction;
+  player.pos=pos;
+  renderPlayers();
+  playStep();
+ },100);
 }
 
-function showQuestion(tile){
+/* =====================================
+   PETI MISTERI DAN SOALAN
+===================================== */
+
+function openChest(){
  playChest();
- const pack=chestContents[tile];
- const q=pack[Math.floor(Math.random()*pack.length)];
- activeQuestion={tile,...q};
- $("subject").textContent="Bidang: "+q.subject;
- $("question").textContent=q.text;
- $("quizModal").classList.add("show");
- say("Peti misteri ditemui! Jawab soalan.");
+ const subjects=["Agama","Matematik","Sains"];
+ const subject=subjects[randomInt(0,2)];
+ const bank=questions[subject];
+ const q=bank[randomInt(0,bank.length-1)];
+ currentQuestion={subject,text:q[0],answer:q[1]};
+ document.getElementById("subjectName").textContent="Subjek: "+subject;
+ document.getElementById("questionText").textContent=q[0];
+ const area=document.getElementById("answerArea");
+ area.innerHTML="";
+ const yes=document.createElement("button");
+ yes.className="answer";
+ yes.textContent="✅ BETUL";
+ yes.onclick=()=>answerQuestion(true);
+ const no=document.createElement("button");
+ no.className="answer";
+ no.textContent="❌ SALAH";
+ no.onclick=()=>answerQuestion(false);
+ area.appendChild(yes);
+ area.appendChild(no);
+ document.getElementById("questionModal").classList.remove("hidden");
+ updateStatus("Pilih jawapan yang betul.");
 }
-
-$("yes").onclick=()=>answer(true);
-$("no").onclick=()=>answer(false);
-
-async function answer(value){
- if(!activeQuestion||!busy)return;
- playClick();
- const q=activeQuestion;activeQuestion=null;
- openedChests.add(q.tile);
- $("tile"+q.tile).classList.add("opened");
- $("quizModal").classList.remove("show");
-
- if(value===q.correct){
-  const n=Math.floor(Math.random()*6)+3;
+function answerQuestion(choice){
+ if(!currentQuestion)return;
+ const correct=choice===currentQuestion.answer;
+ document.getElementById("questionModal").classList.add("hidden");
+ const p=players[current];
+ const old=p.pos;
+ let movement;
+ let target;
+ if(correct){
+  movement=randomInt(3,8);
+  target=Math.min(TOTAL-1,old+movement);
   playCorrect();
-  await showEffect("👼","JAWAPAN BETUL!","Malaikat datang membantu! Watak maju "+n+" petak.",1100);
-  playAngel();
-  await movePlayer(current,n);
+  log(`${p.short} menjawab BETUL. Maju ${movement} petak!`);
+  showEffect("👼","Jawapan Betul!","Malaikat hadir membawa berita gembira. "+p.short+" maju "+movement+" petak.",()=>{
+   movePlayerAfterAnswer(p,old,target);
+  });
  }else{
-  const n=Math.floor(Math.random()*7)+4;
+  movement=randomInt(4,10);
+  target=Math.max(0,old-movement);
   playWrong();
-  await showEffect("👹","JAWAPAN SALAH!","Jin muncul menangkap watak! Watak undur "+n+" petak.",1300);
-  playGenie();
-  await movePlayer(current,-n);
+  log(`${p.short} menjawab SALAH. Undur ${movement} petak.`);
+  showEffect("🧞","Jawapan Belum Tepat","Jin muncul! "+p.short+" perlu mengundur "+movement+" petak.",()=>{
+   movePlayerAfterAnswer(p,old,target);
+  });
  }
- if(players[current].position===199)winGame();
- else finishTurn();
+ currentQuestion=null;
+}
+function movePlayerAfterAnswer(p,old,target){
+ p.pos=old;
+ renderPlayers();
+ const direction=target>=old?1:-1;
+ let pos=old;
+ const interval=setInterval(()=>{
+  if(pos===target){
+   clearInterval(interval);
+   p.pos=target;
+   renderPlayers();
+   if(p.pos>=TOTAL-1){
+    finishGame(p);
+   }else{
+    nextTurn();
+   }
+   return;
+  }
+  pos+=direction;
+  p.pos=pos;
+  renderPlayers();
+  playStep();
+ },100);
+}
+let effectCallback=null;
+function showEffect(emoji,title,message,callback){
+ effectCallback=callback;
+ document.getElementById("effectEmoji").textContent=emoji;
+ document.getElementById("effectTitle").textContent=title;
+ document.getElementById("effectText").textContent=message;
+ document.getElementById("effectModal").classList.remove("hidden");
+}
+function closeEffect(){
+ document.getElementById("effectModal").classList.add("hidden");
+ if(effectCallback){
+  const fn=effectCallback;
+  effectCallback=null;
+  fn();
+ }
 }
 
-async function showEffect(icon,title,message,time){
- $("effectIcon").textContent=icon;
- $("effectTitle").textContent=title;
- $("effectText").textContent=message;
- $("effectModal").classList.add("show");
- await sleep(time);
- $("effectModal").classList.remove("show");
-}
+/* =====================================
+   GILIRAN DAN KEMENANGAN
+===================================== */
 
-function finishTurn(){
+function nextTurn(){
+ if(gameOver)return;
  current=(current+1)%players.length;
- busy=false;$("roll").disabled=false;
- render();say("Giliran "+players[current].name+". Tekan LEMPAR DADU.");
+ busy=false;
+ renderPlayers();
+ document.getElementById("rollBtn").disabled=false;
+ updateStatus("Giliran "+players[current].short+". Buang dadu!");
 }
-
-function winGame(){
- gameOver=true;busy=true;$("roll").disabled=true;
- playVictory();render();
- showEffect("🏆","TAHNIAH! PEMENANG!",players[current].name+" berjaya sampai ke petak 200!",2500);
- say(players[current].name+" memenangi permainan!");
-}
-
-function newGame(){
+function finishGame(p){
+ gameOver=true;
+ busy=true;
  stopDiceRattle();
- players=animals.map(a=>({...a,position:0}));
- current=0;openedChests=new Set();
- activeQuestion=null;busy=false;gameOver=false;
- createChests();buildBoard();render();
- $("diceCube").className="dice-cube";
- $("quizModal").classList.remove("show");
- $("effectModal").classList.remove("show");
- say("Permainan bermula! Giliran Raden Arunika.");
+ playVictory();
+ document.getElementById("rollBtn").disabled=true;
+ document.getElementById("winnerText").textContent=
+  p.name+" ("+p.short+") berjaya sampai ke petak 200 dan memenangi pengembaraan!";
+ document.getElementById("winModal").classList.remove("hidden");
+ log("🏆 "+p.short+" MENANG!");
+ updateStatus("Permainan tamat. Tahniah kepada juara!");
 }
 
-$("startGame").onclick=async()=>{
- await unlockAudio();
- startMusic();playClick();
- $("introModal").classList.remove("show");
- newGame();
-};
+/* =====================================
+   PERMULAAN
+===================================== */
 
-$("roll").onclick=rollDice;
-$("reset").onclick=()=>{
- playClick();newGame();
-};
-
-$("musicToggle").onclick=async()=>{
- await unlockAudio();
- musicOn=!musicOn;
- $("musicToggle").textContent="🎵 Muzik "+(musicOn?"ON":"OFF");
- if(musicOn)startMusic();else stopMusic();
-};
-
-$("soundToggle").onclick=async()=>{
- await unlockAudio();
- soundOn=!soundOn;
- $("soundToggle").textContent="🔊 Bunyi "+(soundOn?"ON":"OFF");
- if(soundOn)playClick();
- if(!soundOn)stopDiceRattle();
-};
-
-prepareCharacters();
-newGame();
-$("roll").disabled=true;
+makeChests();
+createBoard();
+updateStatus("Tekan MULA PENGEMBARAAN untuk bermain.");
 </script>
 </body>
 </html>
