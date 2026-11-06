@@ -1,0 +1,542 @@
+
+<!DOCTYPE html>
+<html lang="ms">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+<title>Dadu Peti Misteri</title>
+
+<style>
+*{box-sizing:border-box}
+body{
+ margin:0;
+ font-family:Arial,sans-serif;
+ color:white;
+ background:radial-gradient(circle at top,#26734d,#092c24 75%);
+ min-height:100vh;
+}
+header{
+ text-align:center;
+ padding:15px 8px 8px;
+}
+header h1{
+ margin:4px;
+ color:#ffe58b;
+ font-size:clamp(23px,5vw,36px);
+ text-shadow:0 3px 5px #000;
+}
+header p{margin:5px;color:#d8f5d8;font-size:13px}
+.game{max-width:1000px;margin:auto;padding:10px}
+.hud{
+ display:grid;
+ grid-template-columns:repeat(4,1fr);
+ gap:7px;
+ margin-bottom:10px;
+}
+.player{
+ background:#123e31;
+ border:2px solid #659b68;
+ border-radius:12px;
+ padding:8px 3px;
+ text-align:center;
+ font-size:12px;
+}
+.player.active{
+ border-color:#ffe36a;
+ box-shadow:0 0 12px #ffe36a;
+ background:#245b3c;
+}
+.player .animal{font-size:27px;display:block}
+.player strong{display:block;margin-top:3px}
+.board-wrap{
+ background:linear-gradient(135deg,#17643d,#0c452e);
+ border:5px solid #bd9345;
+ border-radius:15px;
+ padding:7px;
+ box-shadow:0 8px 25px #0008,inset 0 0 20px #0005;
+}
+.board{
+ display:grid;
+ grid-template-columns:repeat(10,minmax(0,1fr));
+ gap:3px;
+}
+.tile{
+ aspect-ratio:1;
+ min-width:0;
+ position:relative;
+ display:flex;
+ flex-direction:column;
+ align-items:center;
+ justify-content:center;
+ border-radius:5px;
+ border:1px solid #b3d99b;
+ background:linear-gradient(145deg,#a6d66b,#5b9b43);
+ color:#163b24;
+ box-shadow:inset 0 -3px 0 #397637;
+ overflow:hidden;
+}
+.tile:nth-child(4n){
+ background:linear-gradient(145deg,#d3e98d,#79b64c);
+}
+.tile.chest{
+ background:linear-gradient(145deg,#ffdf76,#d99a30);
+ border:2px solid #fff0a0;
+ box-shadow:0 0 9px #ffcf4d;
+}
+.tile.finish{
+ background:linear-gradient(145deg,#ffe9a1,#e4a92c);
+}
+.number{
+ position:absolute;
+ top:2px;
+ left:4px;
+ font-size:clamp(7px,1.5vw,11px);
+ font-weight:bold;
+ opacity:.75;
+}
+.chest-icon{font-size:clamp(13px,3vw,25px)}
+.tokens{
+ display:flex;
+ flex-wrap:wrap;
+ justify-content:center;
+ align-items:center;
+ gap:0;
+ z-index:2;
+}
+.token{
+ font-size:clamp(13px,3.1vw,25px);
+ line-height:1.1;
+ filter:drop-shadow(0 2px 1px #333);
+ animation:bob 1s infinite ease-in-out;
+}
+@keyframes bob{
+ 0%,100%{transform:translateY(0)}
+ 50%{transform:translateY(-3px)}
+}
+.controls{
+ margin-top:12px;
+ padding:14px;
+ border-radius:15px;
+ background:#103b30;
+ border:2px solid #548e62;
+ text-align:center;
+}
+.turn{
+ color:#ffe68b;
+ font-size:18px;
+ font-weight:bold;
+}
+.dice{
+ font-size:60px;
+ margin:8px;
+ text-shadow:0 4px 8px #0008;
+}
+button{
+ border:0;
+ border-radius:12px;
+ padding:13px 22px;
+ font-size:17px;
+ font-weight:bold;
+ cursor:pointer;
+}
+.roll{
+ background:linear-gradient(#ffe98c,#e5a72d);
+ color:#51320c;
+ box-shadow:0 4px 0 #99641d;
+}
+.roll:active{transform:translateY(3px);box-shadow:none}
+.roll:disabled{opacity:.45}
+.reset{
+ background:#426e5a;
+ color:white;
+ margin-left:6px;
+ font-size:13px;
+ padding:12px;
+}
+.message{
+ min-height:35px;
+ padding:10px 5px 0;
+ color:#e6f8d9;
+ font-size:14px;
+}
+.legend{
+ display:flex;
+ flex-wrap:wrap;
+ justify-content:center;
+ gap:12px;
+ margin:10px 0;
+ font-size:12px;
+ color:#e3f5dc;
+}
+.modal{
+ display:none;
+ position:fixed;
+ inset:0;
+ z-index:10;
+ background:#000b;
+ align-items:center;
+ justify-content:center;
+ padding:15px;
+}
+.modal.show{display:flex}
+.dialog{
+ width:min(460px,100%);
+ background:linear-gradient(145deg,#1d6546,#10372e);
+ border:3px solid #e6bd55;
+ border-radius:20px;
+ padding:22px;
+ text-align:center;
+ box-shadow:0 0 35px #000;
+ animation:pop .3s ease;
+}
+@keyframes pop{
+ from{transform:scale(.75);opacity:0}
+ to{transform:scale(1);opacity:1}
+}
+.dialog h2{color:#ffe58a;margin:5px}
+.subject{color:#a9e9b4;font-weight:bold}
+.question{font-size:20px;line-height:1.5;margin:20px 0}
+.answers{display:flex;gap:12px}
+.answers button{flex:1}
+.yes{background:#5bc779;color:#07351c}
+.no{background:#e56b68;color:#fff}
+.effect{
+ font-size:65px;
+ animation:bob .6s infinite;
+}
+.effect-text{font-size:18px;line-height:1.5}
+@media(max-width:430px){
+ .game{padding:6px}
+ .board-wrap{padding:4px}
+ .board{gap:2px}
+ .tile{border-radius:3px}
+ .hud{gap:4px}
+ .player{padding:6px 1px;font-size:10px}
+}
+</style>
+</head>
+
+<body>
+
+<header>
+ <h1>🎲 DADU PETI MISTERI</h1>
+ <p>Cabaran ilmu dan pengembaraan empat sahabat!</p>
+</header>
+
+<main class="game">
+
+ <section class="hud" id="players"></section>
+
+ <div class="board-wrap">
+  <div class="board" id="board"></div>
+ </div>
+
+ <div class="legend">
+  <span>🦌 Kijang</span>
+  <span>🐰 Arnab</span>
+  <span>🦊 Panda Merah</span>
+  <span>🐿️ Tupai</span>
+  <span>🎁 Peti Misteri</span>
+ </div>
+
+ <section class="controls">
+  <div class="turn" id="turn">Giliran Kijang</div>
+  <div class="dice" id="dice">🎲</div>
+  <button class="roll" id="roll">LEMPAR DADU</button>
+  <button class="reset" id="reset">MULA SEMULA</button>
+  <div class="message" id="message">
+   Tekan lempar dadu untuk memulakan permainan.
+  </div>
+ </section>
+
+</main>
+
+<div class="modal" id="quizModal">
+ <div class="dialog">
+  <div class="effect">🎁</div>
+  <h2>PETI MISTERI!</h2>
+  <div class="subject" id="subject"></div>
+  <div class="question" id="question"></div>
+  <div class="answers">
+   <button class="yes" id="yes">BETUL</button>
+   <button class="no" id="no">SALAH</button>
+  </div>
+ </div>
+</div>
+
+<div class="modal" id="effectModal">
+ <div class="dialog">
+  <div class="effect" id="effectIcon"></div>
+  <h2 id="effectTitle"></h2>
+  <div class="effect-text" id="effectText"></div>
+ </div>
+</div>
+
+<script>
+"use strict";
+
+const $ = id => document.getElementById(id);
+
+const animals = [
+ {name:"Kijang",icon:"🦌"},
+ {name:"Arnab",icon:"🐰"},
+ {name:"Panda Merah",icon:"🦊"},
+ {name:"Tupai",icon:"🐿️"}
+];
+
+const questions = {
+ Agama:[
+  ["Solat fardu sehari semalam ada lima waktu.",true],
+  ["Kita digalakkan bercakap benar.",true],
+  ["Kita boleh mengejek kawan.",false],
+  ["Al-Quran ialah kitab suci umat Islam.",true],
+  ["Menjaga kebersihan ialah amalan baik.",true],
+  ["Berbohong ialah perbuatan terpuji.",false],
+  ["Kita perlu menghormati ibu bapa.",true],
+  ["Memberi salam ialah amalan yang baik.",true],
+  ["Kita boleh mengambil barang orang tanpa izin.",false],
+  ["Bersedekah merupakan amalan baik.",true]
+ ],
+ Matematik:[
+  ["7 + 5 = 12.",true],
+  ["9 - 4 = 6.",false],
+  ["3 × 4 = 12.",true],
+  ["20 ÷ 5 = 4.",true],
+  ["15 lebih kecil daripada 8.",false],
+  ["10 + 10 = 20.",true],
+  ["6 × 2 = 10.",false],
+  ["30 ÷ 3 = 10.",true],
+  ["8 + 9 = 17.",true],
+  ["25 - 5 = 15.",false]
+ ],
+ Sains:[
+  ["Matahari ialah sumber cahaya semula jadi.",true],
+  ["Ikan bernafas menggunakan insang.",true],
+  ["Akar membantu tumbuhan menyerap air.",true],
+  ["Bulan menghasilkan cahaya sendiri.",false],
+  ["Air boleh membeku apabila cukup sejuk.",true],
+  ["Manusia bernafas menggunakan paru-paru.",true],
+  ["Semua haiwan hidup di dalam air.",false],
+  ["Daun biasanya berwarna hijau.",true],
+  ["Ais ialah air dalam keadaan pepejal.",true],
+  ["Matahari ialah sebuah planet.",false]
+ ]
+};
+
+let players = [];
+let current = 0;
+let chestTiles = [];
+let openedChests = new Set();
+let activeQuestion = null;
+let busy = false;
+let gameOver = false;
+
+function shuffle(a){
+ let b=[...a];
+ for(let i=b.length-1;i>0;i--){
+  let j=Math.floor(Math.random()*(i+1));
+  [b[i],b[j]]=[b[j],b[i]];
+ }
+ return b;
+}
+
+function newGame(){
+ players = animals.map((a,i)=>({
+  ...a,position:0,score:0
+ }));
+ current=0;
+ openedChests.clear();
+ chestTiles=shuffle(Array.from({length:190},(_,i)=>i+5))
+  .slice(0,30).sort((a,b)=>a-b);
+ busy=false;
+ gameOver=false;
+ $("quizModal").classList.remove("show");
+ $("effectModal").classList.remove("show");
+ $("roll").disabled=false;
+ buildBoard();
+ render();
+ say("Selamat datang! Tekan LEMPAR DADU.");
+ $("dice").textContent="🎲";
+}
+
+function buildBoard(){
+ const board=$("board");
+ board.innerHTML="";
+ const chests=new Set(chestTiles);
+
+ for(let i=0;i<200;i++){
+  const row=Math.floor(i/10);
+  const offset=i%10;
+  const col=row%2===0?offset:9-offset;
+
+  const tile=document.createElement("div");
+  tile.className="tile";
+  tile.style.gridRow=(row+1);
+  tile.style.gridColumn=(col+1);
+  tile.id="tile"+i;
+
+  if(chests.has(i)){
+   tile.classList.add("chest");
+   tile.innerHTML='<span class="number">'+(i+1)+'</span><span class="chest-icon">🎁</span><div class="tokens"></div>';
+  }else if(i===199){
+   tile.classList.add("finish");
+   tile.innerHTML='<span class="number">200</span><span>🏆</span><div class="tokens"></div>';
+  }else{
+   tile.innerHTML='<span class="number">'+(i+1)+'</span><div class="tokens"></div>';
+  }
+  board.appendChild(tile);
+ }
+}
+
+function render(){
+ const playerBox=$("players");
+ playerBox.innerHTML="";
+
+ players.forEach((p,i)=>{
+  const card=document.createElement("div");
+  card.className="player"+(i===current?" active":"");
+  card.innerHTML=`
+   <span class="animal">${p.icon}</span>
+   <strong>${p.name}</strong>
+   Petak ${p.position+1}
+  `;
+  playerBox.appendChild(card);
+ });
+
+ document.querySelectorAll(".tokens").forEach(t=>t.innerHTML="");
+
+ players.forEach((p,i)=>{
+  const tile=$("tile"+p.position);
+  if(tile){
+   const token=document.createElement("span");
+   token.className="token";
+   token.textContent=p.icon;
+   token.title=p.name;
+   tile.querySelector(".tokens").appendChild(token);
+  }
+ });
+
+ $("turn").textContent=gameOver
+  ?"Permainan tamat!"
+  :"Giliran: "+players[current].name;
+}
+
+function say(text){$("message").textContent=text}
+
+function sleep(ms){
+ return new Promise(resolve=>setTimeout(resolve,ms));
+}
+
+async function movePlayer(index,amount){
+ const p=players[index];
+ const direction=amount>=0?1:-1;
+ const steps=Math.abs(amount);
+
+ for(let s=0;s<steps;s++){
+  p.position=Math.max(0,Math.min(199,p.position+direction));
+  render();
+  await sleep(110);
+ }
+}
+
+async function rollDice(){
+ if(busy||gameOver)return;
+ busy=true;
+ $("roll").disabled=true;
+
+ const roll=Math.floor(Math.random()*6)+1;
+ $("dice").textContent=["⚀","⚁","⚂","⚃","⚄","⚅"][roll-1];
+ say(players[current].name+" mendapat "+roll+".");
+ await movePlayer(current,roll);
+
+ if(players[current].position===199){
+  winGame();
+  return;
+ }
+
+ const tile=players[current].position;
+ if(chestTiles.includes(tile)&&!openedChests.has(tile)){
+  await sleep(300);
+  showQuestion(tile);
+ }else{
+  finishTurn();
+ }
+}
+
+function showQuestion(tile){
+ const subjects=["Agama","Matematik","Sains"];
+ const subject=subjects[Math.floor(Math.random()*3)];
+ const pool=questions[subject];
+ const q=pool[Math.floor(Math.random()*pool.length)];
+
+ activeQuestion={tile,subject,text:q[0],correct:q[1]};
+ $("subject").textContent="Bidang: "+subject;
+ $("question").textContent=q[0];
+ $("quizModal").classList.add("show");
+ say("Peti misteri ditemui!");
+}
+
+$("yes").addEventListener("click",()=>answer(true));
+$("no").addEventListener("click",()=>answer(false));
+
+async function answer(value){
+ if(!activeQuestion||!busy)return;
+
+ const q=activeQuestion;
+ activeQuestion=null;
+ openedChests.add(q.tile);
+ $("quizModal").classList.remove("show");
+
+ if(value===q.correct){
+  const n=Math.floor(Math.random()*6)+3;
+  await showEffect("👼","MANTAP! JAWAPAN BETUL",
+   "Malaikat datang membantu! Maju "+n+" petak.",1100);
+  await movePlayer(current,n);
+ }else{
+  const n=Math.floor(Math.random()*7)+4;
+  await showEffect("👹","ALAMAK! JAWAPAN SALAH",
+   "Jin muncul menangkap watak! Undur "+n+" petak.",1300);
+  await movePlayer(current,-n);
+ }
+
+ if(players[current].position===199){
+  winGame();
+ }else{
+  finishTurn();
+ }
+}
+
+async function showEffect(icon,title,message,time){
+ $("effectIcon").textContent=icon;
+ $("effectTitle").textContent=title;
+ $("effectText").textContent=message;
+ $("effectModal").classList.add("show");
+ await sleep(time);
+ $("effectModal").classList.remove("show");
+}
+
+function finishTurn(){
+ current=(current+1)%players.length;
+ busy=false;
+ $("roll").disabled=false;
+ render();
+ say("Giliran "+players[current].name+". Lempar dadu!");
+}
+
+function winGame(){
+ gameOver=true;
+ busy=true;
+ $("roll").disabled=true;
+ render();
+ showEffect("🏆","TAHNIAH! PEMENANG!",
+  players[current].name+" berjaya sampai ke petak terakhir!",2500);
+ say(players[current].name+" memenangi permainan!");
+}
+
+$("roll").addEventListener("click",rollDice);
+$("reset").addEventListener("click",newGame);
+
+newGame();
+</script>
+</body>
+</html>
