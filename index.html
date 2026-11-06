@@ -9,98 +9,38 @@
 
 <style>
 *{box-sizing:border-box}
-body{
- margin:0;background:#102d22;color:white;
- font-family:Arial,sans-serif;overflow-x:hidden;
-}
+body{margin:0;background:#102d22;color:white;font-family:Arial,sans-serif;overflow-x:hidden}
 button{font-family:inherit;cursor:pointer}
-header{
- text-align:center;padding:14px 8px;
- background:linear-gradient(135deg,#164c35,#26734c);
- border-bottom:3px solid #d9b65b;
-}
+header{text-align:center;padding:14px 8px;background:linear-gradient(135deg,#164c35,#26734c);border-bottom:3px solid #d9b65b}
 header h1{margin:0;font-size:clamp(22px,5vw,34px);color:#ffe69a}
 header p{margin:5px 0 0;font-size:13px}
 .container{max-width:1100px;margin:auto;padding:10px}
-.topbar{
- display:flex;justify-content:space-between;align-items:center;
- gap:8px;flex-wrap:wrap;margin-bottom:10px;
-}
-.info{
- background:#1b4935;border:1px solid #548465;
- border-radius:12px;padding:9px 12px;font-size:13px;
-}
+.topbar{display:flex;justify-content:space-between;align-items:center;gap:8px;flex-wrap:wrap;margin-bottom:10px}
+.info{background:#1b4935;border:1px solid #548465;border-radius:12px;padding:9px 12px;font-size:13px}
 .controls{display:flex;gap:7px;flex-wrap:wrap}
-.smallbtn{
- border:1px solid #8db99a;background:#245b3d;color:white;
- padding:9px 12px;border-radius:9px;font-weight:bold;
-}
-.players{
- display:grid;grid-template-columns:repeat(4,1fr);
- gap:7px;margin:10px 0;
-}
-.player{
- background:#1b4935;border:2px solid #467858;
- border-radius:12px;padding:8px 4px;text-align:center;
- min-width:0;opacity:.7;
-}
+.smallbtn{border:1px solid #8db99a;background:#245b3d;color:white;padding:9px 12px;border-radius:9px;font-weight:bold}
+.players{display:grid;grid-template-columns:repeat(4,1fr);gap:7px;margin:10px 0}
+.player{background:#1b4935;border:2px solid #467858;border-radius:12px;padding:8px 4px;text-align:center;min-width:0;opacity:.7}
 .player.active{border-color:#ffdc66;opacity:1;box-shadow:0 0 12px #e9c34c}
 .player .animal{font-size:30px}
 .player strong{display:block;font-size:12px}
 .player small{font-size:10px;color:#d4e8d8}
-.board-wrap{
- background:#17412e;border:3px solid #b99b52;
- border-radius:15px;padding:7px;overflow:hidden;
-}
-.board{
- display:grid;grid-template-columns:repeat(20,minmax(0,1fr));
- gap:3px;
-}
-.tile{
- aspect-ratio:1/1;min-width:0;position:relative;
- display:flex;align-items:center;justify-content:center;
- border-radius:4px;background:#d4e8ae;color:#25432d;
- font-size:clamp(7px,1.6vw,12px);font-weight:bold;
- border:1px solid #9eb77b;
-}
+.board-wrap{background:#17412e;border:3px solid #b99b52;border-radius:15px;padding:7px;overflow:hidden}
+.board{display:grid;grid-template-columns:repeat(10,minmax(0,1fr));gap:4px}
+.tile{aspect-ratio:1/1;min-width:0;position:relative;display:flex;align-items:center;justify-content:center;border-radius:7px;background:#d4e8ae;color:#25432d;font-size:clamp(11px,2.4vw,17px);font-weight:bold;border:1px solid #9eb77b}
 .tile:nth-child(4n){background:#b9d994}
-.tile.chest{background:#e5bd5d;border:1px solid #fff0a4}
+.tile.chest{background:#e5bd5d;border:2px solid #fff0a4}
 .tile.start{background:#83c7a0}
 .tile.finish{background:#f1d36c}
-.tile .chesticon{font-size:clamp(10px,2vw,18px)}
-.tile .occupants{
- position:absolute;bottom:0;right:0;left:0;
- display:flex;justify-content:center;flex-wrap:wrap;
- font-size:clamp(9px,2vw,17px);line-height:1;
- text-shadow:0 1px 2px #000;
-}
-.tile .number{position:absolute;top:1px;left:2px;font-size:8px;opacity:.7}
-.game-area{
- display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:12px;
-}
-.panel{
- background:#1b4935;border:1px solid #548465;
- border-radius:14px;padding:12px;text-align:center;
-}
+.tile .chesticon{font-size:clamp(16px,3vw,25px)}
+.tile .occupants{position:absolute;bottom:1px;right:0;left:0;display:flex;justify-content:center;flex-wrap:wrap;font-size:clamp(14px,3vw,25px);line-height:1;text-shadow:0 1px 2px #000}
+.tile .number{position:absolute;top:2px;left:4px;font-size:clamp(8px,1.5vw,11px);opacity:.75}
+.game-area{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:12px}
+.panel{background:#1b4935;border:1px solid #548465;border-radius:14px;padding:12px;text-align:center}
 .panel h3{margin:0 0 8px;color:#ffe69a}
-.dice-stage{
- height:125px;display:flex;align-items:center;justify-content:center;
- perspective:700px;
-}
-.dice{
- width:70px;height:70px;position:relative;
- transform-style:preserve-3d;
- transition:transform .45s cubic-bezier(.2,.8,.2,1);
-}
-.face{
- position:absolute;width:70px;height:70px;
- background:linear-gradient(145deg,#fff,#dce4dc);
- border:3px solid #aebcae;border-radius:12px;
- display:flex;align-items:center;justify-content:center;
- color:#182b20;font-size:42px;font-weight:bold;
- backface-visibility:hidden;
- box-shadow:inset 0 0 8px #9da99e;
-}
+.dice-stage{height:125px;display:flex;align-items:center;justify-content:center;perspective:700px}
+.dice{width:70px;height:70px;position:relative;transform-style:preserve-3d;transition:transform .45s cubic-bezier(.2,.8,.2,1)}
+.face{position:absolute;width:70px;height:70px;background:linear-gradient(145deg,#fff,#dce4dc);border:3px solid #aebcae;border-radius:12px;display:flex;align-items:center;justify-content:center;color:#182b20;font-size:42px;font-weight:bold;backface-visibility:hidden;box-shadow:inset 0 0 8px #9da99e}
 .front{transform:translateZ(35px)}
 .back{transform:rotateY(180deg) translateZ(35px)}
 .right{transform:rotateY(90deg) translateZ(35px)}
@@ -121,58 +61,33 @@ header p{margin:5px 0 0;font-size:13px}
 .dice.result4{transform:rotateX(90deg) rotateY(0)}
 .dice.result5{transform:rotateX(0) rotateY(90deg)}
 .dice.result6{transform:rotateX(0) rotateY(180deg)}
-.rollbtn{
- background:linear-gradient(#ffe58b,#d5a82e);color:#49360b;
- border:2px solid #fff0ac;border-radius:12px;
- padding:12px 28px;font-size:18px;font-weight:900;
- box-shadow:0 4px 0 #8c6a1b;
-}
+.rollbtn{background:linear-gradient(#ffe58b,#d5a82e);color:#49360b;border:2px solid #fff0ac;border-radius:12px;padding:12px 28px;font-size:18px;font-weight:900;box-shadow:0 4px 0 #8c6a1b}
 .rollbtn:disabled{opacity:.45;cursor:not-allowed}
 .status{font-size:13px;line-height:1.5;min-height:35px}
-.log{
- margin-top:10px;background:#102f22;border-radius:10px;
- padding:9px;text-align:left;font-size:12px;
- max-height:90px;overflow:auto;color:#d7e9d9;
-}
-.modal{
- position:fixed;inset:0;background:#000b;z-index:20;
- display:flex;align-items:center;justify-content:center;padding:15px;
-}
+.log{margin-top:10px;background:#102f22;border-radius:10px;padding:9px;text-align:left;font-size:12px;max-height:90px;overflow:auto;color:#d7e9d9}
+.modal{position:fixed;inset:0;background:#000b;z-index:20;display:flex;align-items:center;justify-content:center;padding:15px}
 .modal.hidden{display:none}
-.dialog{
- width:min(480px,100%);max-height:90vh;overflow:auto;
- background:linear-gradient(145deg,#245b3e,#123b2b);
- border:3px solid #e5c15c;border-radius:18px;
- padding:20px;text-align:center;box-shadow:0 10px 40px #0009;
-}
+.dialog{width:min(480px,100%);max-height:90vh;overflow:auto;background:linear-gradient(145deg,#245b3e,#123b2b);border:3px solid #e5c15c;border-radius:18px;padding:20px;text-align:center;box-shadow:0 10px 40px #0009}
 .dialog h2{color:#ffe69a;margin-top:0}
 .dialog p{line-height:1.55;font-size:14px}
-.primary{
- background:linear-gradient(#ffe58b,#d5a82e);color:#49360b;
- border:0;border-radius:10px;padding:12px 20px;
- font-weight:900;font-size:16px;margin:5px;
-}
-.answer{
- display:block;width:100%;margin:9px 0;padding:13px;
- background:#e4edcf;color:#183c29;border:2px solid #a8c18b;
- border-radius:10px;font-size:15px;font-weight:bold;
-}
-.answer:active{transform:scale(.98)}
-.effect{
- font-size:65px;animation:pop .55s ease;
-}
+.effect{font-size:65px;animation:pop .55s ease}
 @keyframes pop{0%{transform:scale(.2);opacity:0}70%{transform:scale(1.2)}100%{transform:scale(1);opacity:1}}
-#questionText{font-size:18px;font-weight:bold;line-height:1.5}
+#questionText{font-size:18px;font-weight:bold;line-height:1.5;margin:12px 0}
+.answer{display:block;width:100%;margin:9px 0;padding:13px;background:#e4edcf;color:#183c29;border:2px solid #a8c18b;border-radius:10px;font-size:15px;font-weight:bold}
+.primary{background:linear-gradient(#ffe58b,#d5a82e);color:#49360b;border:0;border-radius:10px;padding:12px 20px;font-weight:900;font-size:16px;margin:5px}
+.readbtn{background:#245b3d;color:white;border:1px solid #8db99a;border-radius:9px;padding:9px 14px;margin:5px;font-weight:bold}
 @media(max-width:600px){
  .game-area{grid-template-columns:1fr}
- .board{gap:2px}
- .tile .number{font-size:6px}
+ .board{gap:3px}
+ .board-wrap{padding:4px}
+ .tile{border-radius:4px}
  .players{gap:4px}
  .player{padding:6px 2px}
  .player .animal{font-size:25px}
  .player strong{font-size:10px}
  .player small{font-size:9px}
- .board-wrap{padding:4px}
+ .tile .number{font-size:8px;left:2px;top:1px}
+ .tile .occupants{font-size:clamp(12px,3.3vw,20px)}
 }
 </style>
 </head>
@@ -189,6 +104,7 @@ header p{margin:5px 0 0;font-size:13px}
   <div class="controls">
    <button class="smallbtn" id="musicBtn" onclick="toggleMusic()">🎵 Muzik: ON</button>
    <button class="smallbtn" id="soundBtn" onclick="toggleSound()">🔊 Bunyi: ON</button>
+   <button class="smallbtn" id="voiceBtn" onclick="toggleVoice()">🗣️ Suara: ON</button>
    <button class="smallbtn" onclick="restartGame()">↻ Mula semula</button>
   </div>
  </div>
@@ -231,8 +147,8 @@ header p{margin:5px 0 0;font-size:13px}
   <p>Empat pengembara akan berlumba menuju petak ke-200.</p>
   <p>🎲 Setiap pemain membaling dadu mengikut giliran.</p>
   <p>📦 Jika berhenti tepat pada peti misteri, satu soalan akan muncul.</p>
-  <p>✅ Jawapan betul: maju 3 hingga 8 petak.</p>
-  <p>❌ Jawapan salah: undur 4 hingga 10 petak.</p>
+  <p>✅ Jawapan betul: mendapat keuntungan dan maju 3 hingga 8 petak.</p>
+  <p>❌ Jawapan salah: dikenakan hukuman dan undur 4 hingga 10 petak.</p>
   <p>🏆 Pemain pertama yang sampai ke petak 200 menjadi juara!</p>
   <p><b>Subjek:</b> Agama, Matematik dan Sains.</p>
   <button class="primary" onclick="startGame()">MULA PENGEMBARAAN</button>
@@ -245,6 +161,7 @@ header p{margin:5px 0 0;font-size:13px}
   <h2>Peti Misteri Dibuka!</h2>
   <p id="subjectName"></p>
   <div id="questionText"></div>
+  <button class="readbtn" onclick="repeatQuestion()">🔊 Dengar soalan sekali lagi</button>
   <div id="answerArea"></div>
  </div>
 </div>
@@ -254,6 +171,8 @@ header p{margin:5px 0 0;font-size:13px}
   <div class="effect" id="effectEmoji">✨</div>
   <h2 id="effectTitle"></h2>
   <p id="effectText"></p>
+  <button class="readbtn" onclick="repeatEffect()">🔊 Dengar sekali lagi</button>
+  <br>
   <button class="primary" onclick="closeEffect()">TERUSKAN</button>
  </div>
 </div>
@@ -263,15 +182,14 @@ header p{margin:5px 0 0;font-size:13px}
   <div class="effect">🏆🎉</div>
   <h2>JUARA PENGEMBARAAN!</h2>
   <p id="winnerText"></p>
+  <button class="readbtn" onclick="speakText(document.getElementById('winnerText').textContent)">🔊 Dengar</button>
+  <br>
   <button class="primary" onclick="restartGame()">MAIN SEMULA</button>
  </div>
 </div>
 
 <script>
-/* =====================================
-   DATA PEMAIN DAN PAPAN PERMAINAN
-===================================== */
-
+/* PEMAIN */
 const players=[
  {name:"Raden Arunika",animal:"🦌",short:"Kijang",pos:0},
  {name:"Puteri Lazuardi",animal:"🐰",short:"Arnab",pos:0},
@@ -281,97 +199,127 @@ const players=[
 
 const TOTAL=200;
 const CHEST_COUNT=30;
-let current=0;
-let chests=new Set();
-let gameStarted=false;
-let busy=false;
-let gameOver=false;
-let audioCtx=null;
-let masterGain=null;
-let musicGain=null;
-let musicOn=true;
-let soundOn=true;
-let musicTimer=null;
-let musicStep=0;
-let diceTimer=null;
+let current=0,chests=new Set();
+let gameStarted=false,busy=false,gameOver=false;
+let audioCtx=null,masterGain=null,musicGain=null;
+let musicOn=true,soundOn=true,voiceOn=true;
+let musicTimer=null,musicStep=0,diceTimer=null;
 let currentQuestion=null;
+let effectCallback=null;
+let lastSpokenText="";
 
+/* SOALAN */
 const questions={
  Agama:[
-  ["Kita perlu mengucapkan salam apabila bertemu sesama Muslim.",true],
-  ["Solat Subuh mempunyai empat rakaat.",false],
-  ["Bersedekah ialah amalan yang baik.",true],
-  ["Kita boleh bercakap bohong sesuka hati.",false],
-  ["Ibu bapa perlu dihormati.",true],
-  ["Al-Quran ialah kitab suci umat Islam.",true],
-  ["Berwuduk dilakukan sebelum solat.",true],
-  ["Puasa Ramadan diwajibkan pada bulan Ramadan.",true],
-  ["Kita perlu menjaga kebersihan.",true],
-  ["Mengejek kawan ialah akhlak yang baik.",false],
-  ["Nabi Muhammad SAW ialah rasul terakhir.",true],
-  ["Membantu orang yang memerlukan ialah perbuatan baik.",true],
-  ["Kita boleh meninggalkan amanah tanpa sebab.",false],
-  ["Solat Maghrib mempunyai tiga rakaat.",true],
-  ["Berterima kasih tanda menghargai kebaikan.",true],
-  ["Kita digalakkan berdoa kepada Allah.",true],
-  ["Mencuri barang orang lain dibenarkan.",false],
-  ["Membaca Bismillah sebelum makan ialah amalan baik.",true],
-  ["Kita perlu bercakap dengan sopan.",true],
-  ["Menjaga hubungan sesama manusia itu penting.",true]
+ ["Kita perlu mengucapkan salam apabila bertemu sesama Muslim.",true],
+ ["Solat Subuh mempunyai empat rakaat.",false],
+ ["Bersedekah ialah amalan yang baik.",true],
+ ["Kita boleh bercakap bohong sesuka hati.",false],
+ ["Ibu bapa perlu dihormati.",true],
+ ["Al-Quran ialah kitab suci umat Islam.",true],
+ ["Berwuduk dilakukan sebelum solat.",true],
+ ["Puasa Ramadan diwajibkan pada bulan Ramadan.",true],
+ ["Kita perlu menjaga kebersihan.",true],
+ ["Mengejek kawan ialah akhlak yang baik.",false],
+ ["Nabi Muhammad SAW ialah rasul terakhir.",true],
+ ["Membantu orang yang memerlukan ialah perbuatan baik.",true],
+ ["Kita boleh meninggalkan amanah tanpa sebab.",false],
+ ["Solat Maghrib mempunyai tiga rakaat.",true],
+ ["Berterima kasih tanda menghargai kebaikan.",true],
+ ["Kita digalakkan berdoa kepada Allah.",true],
+ ["Mencuri barang orang lain dibenarkan.",false],
+ ["Membaca Bismillah sebelum makan ialah amalan baik.",true],
+ ["Kita perlu bercakap dengan sopan.",true],
+ ["Menjaga hubungan sesama manusia itu penting.",true]
  ],
  Matematik:[
-  ["5 + 3 = 8",true],
-  ["10 - 4 = 3",false],
-  ["6 × 2 = 12",true],
-  ["20 ÷ 5 = 4",true],
-  ["7 + 6 = 14",false],
-  ["15 - 7 = 8",true],
-  ["4 × 4 = 16",true],
-  ["30 ÷ 3 = 10",true],
-  ["9 + 9 = 19",false],
-  ["12 - 5 = 7",true],
-  ["3 × 5 = 15",true],
-  ["18 ÷ 2 = 9",true],
-  ["25 + 5 = 30",true],
-  ["40 - 15 = 20",false],
-  ["8 × 3 = 24",true],
-  ["36 ÷ 6 = 6",true],
-  ["100 lebih besar daripada 90.",true],
-  ["Nombor 45 ialah nombor genap.",false],
-  ["Satu jam mempunyai 60 minit.",true],
-  ["Satu dozen bersamaan 12 biji.",true]
+ ["5 tambah 3 bersamaan 8.",true],
+ ["10 tolak 4 bersamaan 3.",false],
+ ["6 darab 2 bersamaan 12.",true],
+ ["20 bahagi 5 bersamaan 4.",true],
+ ["7 tambah 6 bersamaan 14.",false],
+ ["15 tolak 7 bersamaan 8.",true],
+ ["4 darab 4 bersamaan 16.",true],
+ ["30 bahagi 3 bersamaan 10.",true],
+ ["9 tambah 9 bersamaan 19.",false],
+ ["12 tolak 5 bersamaan 7.",true],
+ ["3 darab 5 bersamaan 15.",true],
+ ["18 bahagi 2 bersamaan 9.",true],
+ ["25 tambah 5 bersamaan 30.",true],
+ ["40 tolak 15 bersamaan 20.",false],
+ ["8 darab 3 bersamaan 24.",true],
+ ["36 bahagi 6 bersamaan 6.",true],
+ ["100 lebih besar daripada 90.",true],
+ ["Nombor 45 ialah nombor genap.",false],
+ ["Satu jam mempunyai 60 minit.",true],
+ ["Satu dozen bersamaan 12 biji.",true]
  ],
  Sains:[
-  ["Matahari membekalkan cahaya dan haba.",true],
-  ["Ikan bernafas menggunakan paru-paru seperti manusia.",false],
-  ["Tumbuhan memerlukan air untuk hidup.",true],
-  ["Ais ialah air dalam bentuk pepejal.",true],
-  ["Bulan menghasilkan cahaya sendiri seperti Matahari.",false],
-  ["Manusia bernafas menggunakan paru-paru.",true],
-  ["Akar membantu tumbuhan menyerap air.",true],
-  ["Air laut biasanya masin.",true],
-  ["Burung mempunyai sayap.",true],
-  ["Semua haiwan hidup di dalam air.",false],
-  ["Bumi mengelilingi Matahari.",true],
-  ["Gigi membantu kita mengunyah makanan.",true],
-  ["Kucing ialah haiwan herbivor.",false],
-  ["Hujan turun daripada awan.",true],
-  ["Telinga membantu kita mendengar.",true],
-  ["Kupu-kupu bermula sebagai ulat beluncas.",true],
-  ["Magnet boleh menarik semua jenis kayu.",false],
-  ["Udara memenuhi ruang.",true],
-  ["Air boleh berubah menjadi wap apabila dipanaskan.",true],
-  ["Jantung membantu mengepam darah.",true]
+ ["Matahari membekalkan cahaya dan haba.",true],
+ ["Ikan bernafas menggunakan paru-paru seperti manusia.",false],
+ ["Tumbuhan memerlukan air untuk hidup.",true],
+ ["Ais ialah air dalam bentuk pepejal.",true],
+ ["Bulan menghasilkan cahaya sendiri seperti Matahari.",false],
+ ["Manusia bernafas menggunakan paru-paru.",true],
+ ["Akar membantu tumbuhan menyerap air.",true],
+ ["Air laut biasanya masin.",true],
+ ["Burung mempunyai sayap.",true],
+ ["Semua haiwan hidup di dalam air.",false],
+ ["Bumi mengelilingi Matahari.",true],
+ ["Gigi membantu kita mengunyah makanan.",true],
+ ["Kucing ialah haiwan herbivor.",false],
+ ["Hujan turun daripada awan.",true],
+ ["Telinga membantu kita mendengar.",true],
+ ["Kupu-kupu bermula sebagai ulat beluncas.",true],
+ ["Magnet boleh menarik semua jenis kayu.",false],
+ ["Udara memenuhi ruang.",true],
+ ["Air boleh berubah menjadi wap apabila dipanaskan.",true],
+ ["Jantung membantu mengepam darah.",true]
  ]
 };
 
-/* =====================================
-   SISTEM AUDIO - DIJANA DALAM PELAYAR
-===================================== */
+/* SUARA PEMBACA */
+function speakText(text){
+ if(!voiceOn||!("speechSynthesis" in window))return;
+ lastSpokenText=text;
+ window.speechSynthesis.cancel();
+ const utterance=new SpeechSynthesisUtterance(text);
+ utterance.lang="ms-MY";
+ utterance.rate=.88;
+ utterance.pitch=1;
+ utterance.volume=1;
 
+ const voices=window.speechSynthesis.getVoices();
+ const malay=voices.find(v=>v.lang&&v.lang.toLowerCase().startsWith("ms"));
+ if(malay)utterance.voice=malay;
+ else{
+  const fallback=voices.find(v=>v.lang&&v.lang.toLowerCase().startsWith("id"));
+  if(fallback)utterance.voice=fallback;
+ }
+ window.speechSynthesis.speak(utterance);
+}
+function repeatQuestion(){
+ if(!currentQuestion)return;
+ speakText("Subjek "+currentQuestion.subject+". Soalannya. "+currentQuestion.text+
+ " Sila pilih betul atau salah.");
+}
+function repeatEffect(){
+ if(lastSpokenText)speakText(lastSpokenText);
+}
+function toggleVoice(){
+ voiceOn=!voiceOn;
+ document.getElementById("voiceBtn").textContent=voiceOn?"🗣️ Suara: ON":"🗣️ Suara: OFF";
+ if(voiceOn){
+  speakText("Suara pembaca diaktifkan.");
+ }else if("speechSynthesis" in window){
+  window.speechSynthesis.cancel();
+ }
+}
+
+/* AUDIO */
 function initAudio(){
  if(audioCtx){
-  if(audioCtx.state==="suspended") audioCtx.resume();
+  if(audioCtx.state==="suspended")audioCtx.resume();
   return;
  }
  const AC=window.AudioContext||window.webkitAudioContext;
@@ -380,12 +328,10 @@ function initAudio(){
  masterGain=audioCtx.createGain();
  masterGain.gain.value=.9;
  masterGain.connect(audioCtx.destination);
-
  musicGain=audioCtx.createGain();
  musicGain.gain.value=.22;
  musicGain.connect(masterGain);
 }
-
 function tone(freq,duration=.15,type="sine",volume=.3,delay=0){
  if(!soundOn||!audioCtx)return;
  const t=audioCtx.currentTime+delay;
@@ -399,31 +345,22 @@ function tone(freq,duration=.15,type="sine",volume=.3,delay=0){
  osc.connect(gain);gain.connect(masterGain);
  osc.start(t);osc.stop(t+duration+.03);
 }
-
 function noise(duration=.12,volume=.2,frequency=1200){
  if(!soundOn||!audioCtx)return;
  const length=Math.max(1,Math.floor(audioCtx.sampleRate*duration));
  const buffer=audioCtx.createBuffer(1,length,audioCtx.sampleRate);
  const data=buffer.getChannelData(0);
- for(let i=0;i<length;i++){
-  data[i]=(Math.random()*2-1)*(1-i/length);
- }
+ for(let i=0;i<length;i++)data[i]=(Math.random()*2-1)*(1-i/length);
  const src=audioCtx.createBufferSource();
  const filter=audioCtx.createBiquadFilter();
  const gain=audioCtx.createGain();
- src.buffer=buffer;
- filter.type="lowpass";
- filter.frequency.value=frequency;
+ src.buffer=buffer;filter.type="lowpass";filter.frequency.value=frequency;
  gain.gain.value=volume;
  src.connect(filter);filter.connect(gain);gain.connect(masterGain);
  src.start();
 }
-
 function playClick(){tone(650,.07,"sine",.13)}
-function playStep(){
- tone(125,.08,"triangle",.18);
- noise(.045,.09,500);
-}
+function playStep(){tone(125,.08,"triangle",.18);noise(.045,.09,500)}
 function playChest(){
  tone(330,.12,"triangle",.22,0);
  tone(440,.14,"triangle",.25,.12);
@@ -451,9 +388,7 @@ function playGenie(){
  tone(130,.45,"sawtooth",.15,.25);
 }
 function playVictory(){
- [523,659,784,1046,784,1046,1318].forEach((n,i)=>{
-  tone(n,.28,"sine",.24,i*.18);
- });
+ [523,659,784,1046,784,1046,1318].forEach((n,i)=>tone(n,.28,"sine",.24,i*.18));
 }
 function playDice(){
  noise(.15,.22,1800);
@@ -472,15 +407,13 @@ function stopDiceRattle(){
 }
 function toggleSound(){
  soundOn=!soundOn;
- document.getElementById("soundBtn").textContent=
-  soundOn?"🔊 Bunyi: ON":"🔇 Bunyi: OFF";
+ document.getElementById("soundBtn").textContent=soundOn?"🔊 Bunyi: ON":"🔇 Bunyi: OFF";
  if(soundOn){initAudio();playClick()}
  else stopDiceRattle();
 }
 function toggleMusic(){
  musicOn=!musicOn;
- document.getElementById("musicBtn").textContent=
-  musicOn?"🎵 Muzik: ON":"🎵 Muzik: OFF";
+ document.getElementById("musicBtn").textContent=musicOn?"🎵 Muzik: ON":"🎵 Muzik: OFF";
  if(musicOn){initAudio();startMusic()}
  else stopMusic();
 }
@@ -492,8 +425,7 @@ function startMusic(){
   const t=audioCtx.currentTime;
   const osc=audioCtx.createOscillator();
   const gain=audioCtx.createGain();
-  osc.type="sine";
-  osc.frequency.value=melody[musicStep%melody.length];
+  osc.type="sine";osc.frequency.value=melody[musicStep%melody.length];
   gain.gain.setValueAtTime(.001,t);
   gain.gain.linearRampToValueAtTime(.12,t+.04);
   gain.gain.exponentialRampToValueAtTime(.001,t+.38);
@@ -517,42 +449,49 @@ function stopMusic(){
  if(musicTimer){clearInterval(musicTimer);musicTimer=null}
 }
 
-/* =====================================
-   PAPAN DAN PETI
-===================================== */
-
+/* PETI DAN PAPAN - LALUAN BERMULA DARI BAWAH */
 function makeChests(){
  chests.clear();
  while(chests.size<CHEST_COUNT){
-  const n=5+Math.floor(Math.random()*190);
-  chests.add(n);
+  chests.add(5+Math.floor(Math.random()*190));
  }
 }
 function createBoard(){
  const board=document.getElementById("board");
  board.innerHTML="";
- for(let i=0;i<TOTAL;i++){
-  const tile=document.createElement("div");
-  tile.className="tile";
-  tile.id="tile"+i;
-  if(i===0)tile.classList.add("start");
-  if(i===TOTAL-1)tile.classList.add("finish");
-  if(chests.has(i))tile.classList.add("chest");
-  const number=document.createElement("span");
-  number.className="number";
-  number.textContent=i+1;
-  tile.appendChild(number);
-  if(chests.has(i)){
-   const chest=document.createElement("span");
-   chest.className="chesticon";
-   chest.textContent="📦";
-   tile.appendChild(chest);
+
+ // Susunan visual atas ke bawah, tetapi nombor laluan bermula dari bawah.
+ for(let visualRow=0;visualRow<20;visualRow++){
+  const rowFromBottom=19-visualRow;
+  for(let col=0;col<10;col++){
+   const index=rowFromBottom*10+
+    (rowFromBottom%2===0?col:9-col);
+
+   const tile=document.createElement("div");
+   tile.className="tile";
+   tile.id="tile"+index;
+   if(index===0)tile.classList.add("start");
+   if(index===TOTAL-1)tile.classList.add("finish");
+   if(chests.has(index))tile.classList.add("chest");
+
+   const number=document.createElement("span");
+   number.className="number";
+   number.textContent=index+1;
+   tile.appendChild(number);
+
+   if(chests.has(index)){
+    const chest=document.createElement("span");
+    chest.className="chesticon";
+    chest.textContent="📦";
+    tile.appendChild(chest);
+   }
+
+   const occupants=document.createElement("div");
+   occupants.className="occupants";
+   occupants.id="occupants"+index;
+   tile.appendChild(occupants);
+   board.appendChild(tile);
   }
-  const occupants=document.createElement("div");
-  occupants.className="occupants";
-  occupants.id="occupants"+i;
-  tile.appendChild(occupants);
-  board.appendChild(tile);
  }
  renderPlayers();
 }
@@ -561,7 +500,7 @@ function renderPlayers(){
   const el=document.getElementById("occupants"+i);
   if(el)el.innerHTML="";
  }
- players.forEach((p,index)=>{
+ players.forEach(p=>{
   const el=document.getElementById("occupants"+p.pos);
   if(el){
    const mark=document.createElement("span");
@@ -579,26 +518,18 @@ function renderPlayerCards(){
   const card=document.createElement("div");
   card.className="player"+(i===current&&!gameOver?" active":"");
   card.innerHTML=`<div class="animal">${p.animal}</div>
-   <strong>${p.short}</strong>
-   <small>Petak ${p.pos+1}</small>`;
+   <strong>${p.short}</strong><small>Petak ${p.pos+1}</small>`;
   box.appendChild(card);
  });
- document.getElementById("turnInfo").textContent=
-  "Giliran: "+players[current].short;
+ document.getElementById("turnInfo").textContent="Giliran: "+players[current].short;
 }
 
-/* =====================================
-   ALIRAN PERMAINAN
-===================================== */
-
+/* PERMAINAN */
 function startGame(){
  initAudio();
  if(musicOn)startMusic();
  document.getElementById("introModal").classList.add("hidden");
- gameStarted=true;
- busy=false;
- gameOver=false;
- current=0;
+ gameStarted=true;busy=false;gameOver=false;current=0;
  updateStatus("Giliran pertama. Buang dadu!");
  log("Pengembaraan bermula!");
  renderPlayers();
@@ -607,13 +538,10 @@ function startGame(){
 function restartGame(){
  initAudio();
  stopDiceRattle();
+ if("speechSynthesis" in window)window.speechSynthesis.cancel();
  players.forEach(p=>p.pos=0);
- current=0;
- busy=false;
- gameOver=false;
- gameStarted=false;
- makeChests();
- createBoard();
+ current=0;busy=false;gameOver=false;gameStarted=false;
+ makeChests();createBoard();
  document.getElementById("dice").className="dice";
  document.getElementById("rollBtn").disabled=true;
  document.getElementById("lastEvent").textContent="Permainan baharu menanti.";
@@ -626,14 +554,14 @@ function restartGame(){
 }
 function updateStatus(text){
  document.getElementById("status").textContent=text;
+ document.getElementById("lastEvent").textContent=text;
 }
 function log(text){
  const box=document.getElementById("log");
  box.innerHTML=text+"<br>"+box.innerHTML;
 }
-function randomInt(min,max){
- return Math.floor(Math.random()*(max-min+1))+min;
-}
+function randomInt(min,max){return Math.floor(Math.random()*(max-min+1))+min}
+
 function rollDice(){
  if(!gameStarted||busy||gameOver)return;
  initAudio();
@@ -643,8 +571,7 @@ function rollDice(){
  const dice=document.getElementById("dice");
  dice.className="dice rolling";
  updateStatus("Dadu sedang bergolek...");
- playDice();
- startDiceRattle();
+ playDice();startDiceRattle();
 
  const result=randomInt(1,6);
  setTimeout(()=>{
@@ -658,15 +585,9 @@ function rollDice(){
   updateStatus(`${p.short} mendapat ${result}.`);
   moveAnimation(p,old,p.pos,()=>{
    renderPlayers();
-   if(p.pos>=TOTAL-1){
-    finishGame(p);
-    return;
-   }
-   if(chests.has(p.pos)){
-    openChest();
-   }else{
-    nextTurn();
-   }
+   if(p.pos>=TOTAL-1){finishGame(p);return}
+   if(chests.has(p.pos))openChest();
+   else nextTurn();
   });
  },2600);
 }
@@ -686,10 +607,7 @@ function moveAnimation(player,from,to,done){
  },100);
 }
 
-/* =====================================
-   PETI MISTERI DAN SOALAN
-===================================== */
-
+/* SOALAN PETI */
 function openChest(){
  playChest();
  const subjects=["Agama","Matematik","Sains"];
@@ -697,6 +615,7 @@ function openChest(){
  const bank=questions[subject];
  const q=bank[randomInt(0,bank.length-1)];
  currentQuestion={subject,text:q[0],answer:q[1]};
+
  document.getElementById("subjectName").textContent="Subjek: "+subject;
  document.getElementById("questionText").textContent=q[0];
  const area=document.getElementById("answerArea");
@@ -712,30 +631,33 @@ function openChest(){
  area.appendChild(yes);
  area.appendChild(no);
  document.getElementById("questionModal").classList.remove("hidden");
- updateStatus("Pilih jawapan yang betul.");
+ updateStatus("Dengar soalan dan pilih jawapan.");
+ speakText("Peti misteri dibuka. Subjek "+subject+". Soalannya. "+q[0]+
+ " Sila pilih betul atau salah.");
 }
+
+/* KEPUTUSAN DAN KEUNTUNGAN / HUKUMAN */
 function answerQuestion(choice){
  if(!currentQuestion)return;
  const correct=choice===currentQuestion.answer;
  document.getElementById("questionModal").classList.add("hidden");
  const p=players[current];
  const old=p.pos;
- let movement;
- let target;
+ const movement=correct?randomInt(3,8):randomInt(4,10);
+ const target=correct?Math.min(TOTAL-1,old+movement):Math.max(0,old-movement);
+
  if(correct){
-  movement=randomInt(3,8);
-  target=Math.min(TOTAL-1,old+movement);
-  playCorrect();
-  log(`${p.short} menjawab BETUL. Maju ${movement} petak!`);
-  showEffect("👼","Jawapan Betul!","Malaikat hadir membawa berita gembira. "+p.short+" maju "+movement+" petak.",()=>{
+  playCorrect();playAngel();
+  const message="Tahniah "+p.short+". Jawapan kamu betul. Kamu mendapat keuntungan. Kamu maju "+movement+" petak.";
+  log(`${p.short} menjawab BETUL. Keuntungan: maju ${movement} petak!`);
+  showEffect("👼","KEUNTUNGAN!","Tahniah! Jawapan betul. "+p.short+" mendapat keuntungan dan maju "+movement+" petak.",message,()=>{
    movePlayerAfterAnswer(p,old,target);
   });
  }else{
-  movement=randomInt(4,10);
-  target=Math.max(0,old-movement);
-  playWrong();
-  log(`${p.short} menjawab SALAH. Undur ${movement} petak.`);
-  showEffect("🧞","Jawapan Belum Tepat","Jin muncul! "+p.short+" perlu mengundur "+movement+" petak.",()=>{
+  playWrong();playGenie();
+  const message="Jawapan kamu salah. "+p.short+" dikenakan hukuman. Kamu perlu undur "+movement+" petak.";
+  log(`${p.short} menjawab SALAH. Hukuman: undur ${movement} petak.`);
+  showEffect("🧞","HUKUMAN!","Jawapan salah. "+p.short+" dikenakan hukuman dan perlu undur "+movement+" petak.",message,()=>{
    movePlayerAfterAnswer(p,old,target);
   });
  }
@@ -751,11 +673,8 @@ function movePlayerAfterAnswer(p,old,target){
    clearInterval(interval);
    p.pos=target;
    renderPlayers();
-   if(p.pos>=TOTAL-1){
-    finishGame(p);
-   }else{
-    nextTurn();
-   }
+   if(p.pos>=TOTAL-1)finishGame(p);
+   else nextTurn();
    return;
   }
   pos+=direction;
@@ -764,13 +683,14 @@ function movePlayerAfterAnswer(p,old,target){
   playStep();
  },100);
 }
-let effectCallback=null;
-function showEffect(emoji,title,message,callback){
+function showEffect(emoji,title,message,spoken,callback){
  effectCallback=callback;
+ lastSpokenText=spoken;
  document.getElementById("effectEmoji").textContent=emoji;
  document.getElementById("effectTitle").textContent=title;
  document.getElementById("effectText").textContent=message;
  document.getElementById("effectModal").classList.remove("hidden");
+ speakText(spoken);
 }
 function closeEffect(){
  document.getElementById("effectModal").classList.add("hidden");
@@ -781,10 +701,7 @@ function closeEffect(){
  }
 }
 
-/* =====================================
-   GILIRAN DAN KEMENANGAN
-===================================== */
-
+/* GILIRAN DAN PEMENANG */
 function nextTurn(){
  if(gameOver)return;
  current=(current+1)%players.length;
@@ -794,22 +711,18 @@ function nextTurn(){
  updateStatus("Giliran "+players[current].short+". Buang dadu!");
 }
 function finishGame(p){
- gameOver=true;
- busy=true;
- stopDiceRattle();
+ gameOver=true;busy=true;stopDiceRattle();
  playVictory();
  document.getElementById("rollBtn").disabled=true;
- document.getElementById("winnerText").textContent=
-  p.name+" ("+p.short+") berjaya sampai ke petak 200 dan memenangi pengembaraan!";
+ const message=p.name+" daripada pasukan "+p.short+" berjaya sampai ke petak 200 dan memenangi pengembaraan. Tahniah!";
+ document.getElementById("winnerText").textContent=message;
  document.getElementById("winModal").classList.remove("hidden");
  log("🏆 "+p.short+" MENANG!");
  updateStatus("Permainan tamat. Tahniah kepada juara!");
+ speakText(message);
 }
 
-/* =====================================
-   PERMULAAN
-===================================== */
-
+/* MULA */
 makeChests();
 createBoard();
 updateStatus("Tekan MULA PENGEMBARAAN untuk bermain.");
